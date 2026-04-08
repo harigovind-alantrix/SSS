@@ -1,77 +1,85 @@
 using System.Collections;
 using System.Collections.Generic;
+using Entities.Player;
+using Features.Gameplay;
 using UnityEngine;
 
-public class PlayerJump : MonoBehaviour
+namespace Entities.Player
 {
-    public float jumpForce = 10f;
-    public float gravity = -25f;
-    public float playerHeight = 1f;
-
-    private float yVelocity;
-    private bool isJumping;
-
-    private GroundChecker groundChecker;
-
-    void Awake()
+    public class PlayerJump : MonoBehaviour
     {
-        groundChecker = GetComponent<GroundChecker>();
-    }
+        public float jumpForce = 10f;
+        public float gravity = -25f;
+        public float playerHeight = 1f;
 
-    void Update()
-    {
-        HandleJumpMotion();
-    }
+        private float yVelocity;
+        private bool isJumping;
 
-    public void Jump()
-    {
-        if (groundChecker.IsGrounded())
+        private GroundChecker groundChecker;
+        public CameraZoomController camerazoom;
+
+        void Awake()
         {
-            yVelocity = jumpForce;
-            isJumping = true;
+            groundChecker = GetComponent<GroundChecker>();
         }
-    }
-    public bool IsJumping()
-    {
-        return isJumping;
-    }
 
-    void HandleJumpMotion()
-    {
-        Vector3 pos = transform.position;
-
-        if (isJumping)
+        void Update()
         {
-            // Apply gravity only during jump
-            yVelocity += gravity * Time.deltaTime;
-            pos.y += yVelocity * Time.deltaTime;
+            HandleJumpMotion();
+        }
 
-            // Check ground
-            RaycastHit hit;
-            if (groundChecker.TryGetGround(out hit))
+        public void Jump()
+        {
+            if (groundChecker.IsGrounded())
             {
-                float groundY = hit.point.y + (playerHeight / 2f);
-
-                // Land condition
-                if (pos.y <= groundY)
-                {
-                    pos.y = groundY;
-                    yVelocity = 0;
-                    isJumping = false;
-                }
+                yVelocity = jumpForce;
+                isJumping = true;
             }
-
-            transform.position = pos;
         }
-        else
+        public bool IsJumping()
         {
-            // Always stick to ground when not jumping
-            RaycastHit hit;
-            if (groundChecker.TryGetGround(out hit))
+            return isJumping;
+        }
+
+        void HandleJumpMotion()
+        {
+            Vector3 pos = transform.position;
+
+            if (isJumping)
             {
-                pos.y = hit.point.y + (playerHeight / 2f);
+                // Apply gravity only during jump
+                yVelocity += gravity * Time.deltaTime;
+                pos.y += yVelocity * Time.deltaTime;
+
+                // Check ground
+                RaycastHit hit;
+                if (groundChecker.TryGetGround(out hit))
+                {
+                    float groundY = hit.point.y + (playerHeight / 2f);
+
+                    // Land condition
+                    if (pos.y <= groundY)
+                    {
+                        pos.y = groundY;
+                        yVelocity = 0;
+                        isJumping = false;
+                        camerazoom.ZoomOut();
+                    }
+                }
+
                 transform.position = pos;
+            }
+            else
+            {
+                // Always stick to ground when not jumping
+                RaycastHit hit;
+                if (groundChecker.TryGetGround(out hit))
+                {
+                    pos.y = hit.point.y + (playerHeight / 2f);
+                    transform.position = pos;
+                }
             }
         }
     }
 }
+

@@ -1,26 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using Entities.Player;
 using UnityEngine;
 
-public class PlayerRotation : MonoBehaviour
+namespace Entities.Player
 {
-    public float rotationSpeed = 360f; // degrees per second
-
-    private PlayerJump jump;
-
-    void Awake()
+    public class PlayerRotation : MonoBehaviour
     {
-        jump = GetComponent<PlayerJump>();
+        public float rotationSpeed = 360f;
+
+        private PlayerJump jump;
+        private float currentZRotation = 0f;
+
+        void Awake()
+        {
+            jump = GetComponent<PlayerJump>();
+        }
+
+        public void Rotate(float moveInput)
+        {
+            if (!jump.IsJumping()) return;
+
+            currentZRotation += -moveInput * rotationSpeed * Time.deltaTime;
+
+            transform.rotation = Quaternion.Euler(0f, 0f, currentZRotation);
+        }
     }
 
-    public void Rotate(float moveInput)
-    {
-        // Rotate only when jumping
-        if (!jump.IsJumping()) return;
-
-        float direction = -moveInput; // flip for correct feel
-
-        Vector3 rotation = new Vector3(0, 0, direction * rotationSpeed * Time.deltaTime);
-        transform.Rotate(rotation);
-    }
 }

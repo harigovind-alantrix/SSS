@@ -14,9 +14,11 @@ namespace UI.Manager
         private readonly ISubscriber<OnGameStateChanged> _subscriber;
         private IDisposable _subscription;
 
-        public UIManager(MainMenuPresenter mainMenuPresenter)
+        public UIManager(MainMenuPresenter mainMenuPresenter,
+            ISubscriber<OnGameStateChanged> subscriber)
         {
             _mainMenuPresenter = mainMenuPresenter;
+            _subscriber = subscriber;
         }
 
         public void Start()
@@ -30,11 +32,15 @@ namespace UI.Manager
             
             _mainMenuPresenter.Initialize();
 
+            _mainMenuPresenter.Show();
+            
             _subscription = _subscriber.Subscribe(OnGameStateChanged);
         }
         
         private void OnGameStateChanged(OnGameStateChanged message)
         {
+            HideAll();
+            
             switch (message.CurrentState)
             {
                 case GameState.Menu:
@@ -43,9 +49,14 @@ namespace UI.Manager
                 case GameState.Playing:
                 case GameState.Shop:
                 case GameState.Settings:
-                    _mainMenuPresenter.Hide();
+                   
                     break;
             }
+        }
+
+        private void HideAll()
+        {
+            _mainMenuPresenter.Hide();
         }
         
         public void Dispose()

@@ -5,8 +5,22 @@ namespace UI.Abstract
     public abstract class ViewBase
     {
         protected GComponent Panel;
+        protected abstract string PackageName { get; }
+        protected abstract string ComponentName { get; }
+        protected abstract void OnCreateUI();
+        protected virtual void OnShow() { }
+        protected virtual void OnHide() { }
 
-        public abstract void CreateUI();
+        public void CreateUI()
+        {
+            UIPackage.AddPackage(PackageName);
+            Panel = UIPackage.CreateObject(PackageName, ComponentName).asCom;
+            GRoot.inst.AddChild(Panel);
+            Panel.SetSize(GRoot.inst.width, GRoot.inst.height);
+            Panel.AddRelation(GRoot.inst, RelationType.Size);
+            OnCreateUI();
+            Hide();
+        }
 
         public void Show()
         {
@@ -18,24 +32,8 @@ namespace UI.Abstract
         public void Hide()
         {
             if (Panel == null) return;
-
             Panel.visible = false;
             OnHide();
-        }
-
-        protected virtual void OnShow() { }
-        protected virtual void OnHide() { }
-
-        protected GComponent CreatePanel(string packageName, string componentName)
-        {
-            UIPackage.AddPackage(packageName);
-            var panel = UIPackage.CreateObject(packageName, componentName).asCom;
-
-            GRoot.inst.AddChild(panel);
-            panel.SetSize(GRoot.inst.width, GRoot.inst.height);
-            panel.AddRelation(GRoot.inst, RelationType.Size);
-
-            return panel;
         }
     }
 }

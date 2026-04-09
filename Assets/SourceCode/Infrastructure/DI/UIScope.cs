@@ -1,3 +1,4 @@
+using UI.Manager;
 using UI.Presenters;
 using UI.Views;
 using VContainer;
@@ -9,6 +10,8 @@ namespace Infrastructure.DI
     {
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.RegisterEntryPoint<UIManager>();
+            
             builder.Register<MainMenuView>(Lifetime.Singleton);
             builder.Register<MainMenuPresenter>(Lifetime.Singleton);
             

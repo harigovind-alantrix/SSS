@@ -44,6 +44,9 @@ namespace UI.Presenters
                 
             }));
         }
+        
+        public void Show() => _mainMenuView.Show();
+        public void Hide() => _mainMenuView.Hide();
 
         public void Dispose()
         {

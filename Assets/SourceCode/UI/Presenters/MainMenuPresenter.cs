@@ -1,24 +1,25 @@
 using System;
-using Core.Messages.System;
-using Core.Models;
 using FairyGUI;
-using MessagePipe;
+using Core.Interfaces;
+using Core.Models;
+using UI.Abstract;
 using UI.Views;
-using VContainer.Unity;
 
 namespace UI.Presenters
 {
-    public class MainMenuPresenter : IDisposable
+    public class MainMenuPresenter :IPresenter, IDisposable
     {
+        public GameState TargetState => GameState.Menu;
+        
         private readonly MainMenuView _view;
-        private readonly IPublisher<OnGameStateChanged> _publisher;
+        private readonly IGameStateService _gameStateService;
 
         public MainMenuPresenter(
             MainMenuView view,
-            IPublisher<OnGameStateChanged> publisher)
+          IGameStateService gameStateService)
         {
             _view = view;
-            _publisher = publisher;
+            _gameStateService = gameStateService;
         }
 
         public void Initialize()
@@ -34,13 +35,13 @@ namespace UI.Presenters
         public void Hide() => _view.Hide();
 
         private void OnPlayClicked(EventContext ctx)
-            => _publisher.Publish(new OnGameStateChanged(GameState.Menu, GameState.Playing));
+            => _gameStateService.SetState(GameState.Playing);
 
         private void OnShopClicked(EventContext ctx)
-            => _publisher.Publish(new OnGameStateChanged(GameState.Menu, GameState.Shop));
+            => _gameStateService.SetState(GameState.Shop);
 
         private void OnSettingsClicked(EventContext ctx)
-            => _publisher.Publish(new OnGameStateChanged(GameState.Menu, GameState.Settings));
+            => _gameStateService.SetState(GameState.Settings);
 
         private void OnExitClicked(EventContext ctx)
         {

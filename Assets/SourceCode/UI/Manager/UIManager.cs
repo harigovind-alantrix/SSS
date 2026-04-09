@@ -1,23 +1,26 @@
 using System;
+using System.Collections.Generic;
+using VContainer.Unity;
+using MessagePipe;
+using FairyGUI;
 using Core.Messages.System;
 using Core.Models;
-using FairyGUI;
-using MessagePipe;
+using UI.Abstract;
 using UI.Presenters;
-using VContainer.Unity;
 
 namespace UI.Manager
 {
     public class UIManager : IStartable, IDisposable
     {
-        private readonly MainMenuPresenter _mainMenuPresenter;
+        private readonly List<IPresenter> _presenters;
         private readonly ISubscriber<OnGameStateChanged> _subscriber;
         private IDisposable _subscription;
 
-        public UIManager(MainMenuPresenter mainMenuPresenter,
+        public UIManager(
+            IEnumerable<IPresenter> presenters,
             ISubscriber<OnGameStateChanged> subscriber)
         {
-            _mainMenuPresenter = mainMenuPresenter;
+            _presenters = new List<IPresenter>(presenters);
             _subscriber = subscriber;
         }
 
@@ -29,36 +32,36 @@ namespace UI.Manager
             scaler.ApplyChange();
             GRoot.inst.ApplyContentScaleFactor();
             GRoot.inst.MakeFullScreen();
-            
-            _mainMenuPresenter.Initialize();
 
-            _mainMenuPresenter.Show();
-            
+            foreach (var presenter in _presenters)
+            {
+                presenter.Initialize();
+            }
+
+            ShowForState(GameState.Menu);
+
             _subscription = _subscriber.Subscribe(OnGameStateChanged);
         }
-        
-        private void OnGameStateChanged(OnGameStateChanged message)
+
+        private void OnGameStateChanged(OnGameStateChanged message) =>
+            ShowForState(message.CurrentState);
+
+
+        private void ShowForState(GameState state)
         {
-            HideAll();
-            
-            switch (message.CurrentState)
+            foreach (var presenter in _presenters)
             {
-                case GameState.Menu:
-                    _mainMenuPresenter.Show();
-                    break;
-                case GameState.Playing:
-                case GameState.Shop:
-                case GameState.Settings:
-                   
-                    break;
+                if (presenter.TargetState == state)
+                {
+                    presenter.Show();
+                }
+                else
+                {
+                    presenter.Hide();
+                }
             }
         }
 
-        private void HideAll()
-        {
-            _mainMenuPresenter.Hide();
-        }
-        
         public void Dispose()
         {
             _subscription?.Dispose();

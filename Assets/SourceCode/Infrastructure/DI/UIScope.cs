@@ -1,3 +1,4 @@
+using UI.Abstract;
 using UI.Manager;
 using UI.Presenters;
 using UI.Views;
@@ -13,7 +14,7 @@ namespace Infrastructure.DI
             builder.RegisterEntryPoint<UIManager>();
             
             builder.Register<MainMenuView>(Lifetime.Singleton);
-            builder.Register<MainMenuPresenter>(Lifetime.Singleton);
+            builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();
             
         }
     }

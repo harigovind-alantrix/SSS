@@ -11,6 +11,8 @@ namespace Features.Gameplay
         public GameObject currentPlayer;
         public GameObject clonePrefab;
 
+        private GameObject lastPlayer; // to remove previous one
+
         public void HandleClone()
         {
             if (currentPlayer == null)
@@ -19,43 +21,86 @@ namespace Features.Gameplay
                 return;
             }
 
-            RecordingSystem recording = currentPlayer.GetComponent<RecordingSystem>();
+            // 🔥 Remove previous old player
+            RemoveOldPlayer();
 
-            if (recording == null)
+            PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
+
+            if (playerController == null)
             {
-                Debug.Log("RecordingSystem missing!");
+                Debug.Log("PlayerController missing!");
                 return;
             }
 
-            List<RecordingData> data = recording.ConsumeRecording();
+            Vector3 spawnPos = currentPlayer.transform.position;
+            Quaternion spawnRot = currentPlayer.transform.rotation;
 
-            if (data == null || data.Count == 0)
+
+            float input = playerController.GetCurrentInput();
+
+            Vector3 direction = Vector3.zero;
+
+            if (Mathf.Abs(input) > 0.1f)
             {
-                Debug.Log("No recording data");
-                return;
+                direction = new Vector3(input, 0, 0).normalized;
             }
 
-            GameObject clone = Instantiate(
-                clonePrefab,
-                data[0].Position,
-                data[0].Rotation
-            );
 
-            clone.GetComponent<ClonePlayback>().Initialize(data);
+            PlayerController pc = currentPlayer.GetComponent<PlayerController>();
+            if (pc != null) pc.enabled = false;
+
+            PlayerMovement movement = currentPlayer.GetComponent<PlayerMovement>();
+            if (movement != null) movement.enabled = false;
+
+            PlayerJump jump = currentPlayer.GetComponent<PlayerJump>();
+            if (jump != null) jump.enabled = false;
+
+            PlayerRotation rotation = currentPlayer.GetComponent<PlayerRotation>();
+            if (rotation != null) rotation.enabled = false;
+
+            Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+                rb.isKinematic = true; // 🔥 stops physics interaction
+            }
+
+
+
+
+            // 🔥 Spawn clone
+            GameObject clone = Instantiate(clonePrefab, spawnPos, spawnRot);
+
+            // 🔥 Apply boost to clone
+            CloneBoost boost = clone.GetComponent<CloneBoost>();
+            if (boost != null)
+            {
+                boost.ApplyBoost(direction);
+            }
+            else
+            {
+                Debug.Log("CloneBoost missing on prefab!");
+            }
+
+            // 🔥 Store old player for next cleanup
+            lastPlayer = currentPlayer;
+
+            // 🔥 Switch control to clone
+            currentPlayer = clone;
+
+            Debug.Log("Clone spawned with boost!");
         }
 
-        public void SwitchToClone(GameObject newClone)
+        // 🔥 Remove previous player (called before spawning next clone)
+        void RemoveOldPlayer()
         {
-            GameObject oldPlayer = currentPlayer;
-
-            currentPlayer = newClone;
-
-            if (oldPlayer != null)
+            if (lastPlayer != null)
             {
-                Destroy(oldPlayer);
+                Destroy(lastPlayer);
+                lastPlayer = null;
             }
-
-            Debug.Log("Switched to new clone!");
         }
     }
 }

@@ -18,8 +18,7 @@ GameObject:
   - component: {fileID: 5136730982626983660}
   - component: {fileID: 5557838877348129821}
   - component: {fileID: 3339621788499541355}
-  - component: {fileID: 6162181497793034693}
-  - component: {fileID: 1909954578322416527}
+  - component: {fileID: 4142513824794710843}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -119,7 +118,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 64
   m_CollisionDetection: 0
 --- !u!114 &5465670306663639787
 MonoBehaviour:
@@ -193,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 360
---- !u!114 &6162181497793034693
+--- !u!114 &4142513824794710843
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,19 +201,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4782842002824387290}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ef0d65227d314ab89c0c09b61ddb361, type: 3}
+  m_Script: {fileID: 11500000, guid: 2332c6e37bd1b49e8ab03129c6ad4261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1909954578322416527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4782842002824387290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70ca9270796164573bc3535aeb830c50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playbackRate: 0.02
+  boostForce: 10
+  upwardForce: 6
+  boostDuration: 0.25

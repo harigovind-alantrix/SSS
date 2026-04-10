@@ -814,7 +814,6 @@ GameObject:
   m_Component:
   - component: {fileID: 577340955}
   - component: {fileID: 577340954}
-  - component: {fileID: 577340953}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -822,20 +821,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &577340953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 577340952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d131c1d60e3440638dbe8a3b645d3f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  clonePrefab: {fileID: 4782842002824387290, guid: 63bfb90e1835244cf9e7dce621c77718,
-    type: 3}
 --- !u!114 &577340954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -964,8 +949,6 @@ GameObject:
   - component: {fileID: 1000553928}
   - component: {fileID: 1000553927}
   - component: {fileID: 1000553935}
-  - component: {fileID: 1000553936}
-  - component: {fileID: 1000553937}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1061,7 +1044,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 64
   m_CollisionDetection: 0
 --- !u!65 &1000553932
 BoxCollider:
@@ -1139,31 +1122,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 360
---- !u!114 &1000553936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000553925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ef0d65227d314ab89c0c09b61ddb361, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1000553937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000553925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70ca9270796164573bc3535aeb830c50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playbackRate: 0.02
 --- !u!1 &1034662642
 GameObject:
   m_ObjectHideFlags: 0

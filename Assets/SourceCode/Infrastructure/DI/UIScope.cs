@@ -13,6 +13,8 @@ namespace Infrastructure.DI
         {
             builder.RegisterEntryPoint<UIManager>();
             
+            builder.Register<PopUpManager>(Lifetime.Singleton).As<IPopUpManager>();
+            
             //! View
             builder.Register<MainMenuView>(Lifetime.Singleton);
             builder.Register<SettingsView>(Lifetime.Singleton);

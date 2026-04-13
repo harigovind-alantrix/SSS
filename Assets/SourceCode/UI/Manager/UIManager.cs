@@ -6,7 +6,6 @@ using FairyGUI;
 using Core.Messages.System;
 using Core.Models;
 using UI.Abstract;
-using UI.Presenters;
 
 namespace UI.Manager
 {
@@ -15,16 +14,21 @@ namespace UI.Manager
         private readonly List<IPresenter> _presenters;
         private readonly List<IPopUp> _popUps;
         private readonly ISubscriber<OnGameStateChanged> _subscriber;
+        private readonly IScreenTracker _screenTracker;
+
         private IDisposable _subscription;
 
         public UIManager(
             IEnumerable<IPresenter> presenters,
             IEnumerable<IPopUp> popUps,
-            ISubscriber<OnGameStateChanged> subscriber)
+            ISubscriber<OnGameStateChanged> subscriber,
+            IScreenTracker screenTracker)
+
         {
             _presenters = new List<IPresenter>(presenters);
             _popUps = new List<IPopUp>(popUps);
             _subscriber = subscriber;
+            _screenTracker = screenTracker;
         }
 
         public void Start()
@@ -40,6 +44,7 @@ namespace UI.Manager
             {
                 popUp.Initialize();
             }
+
             foreach (var presenter in _presenters)
             {
                 presenter.Initialize();
@@ -60,6 +65,7 @@ namespace UI.Manager
             {
                 if (presenter.TargetState == state)
                 {
+                    _screenTracker.SetActive(presenter);
                     presenter.Show();
                 }
                 else

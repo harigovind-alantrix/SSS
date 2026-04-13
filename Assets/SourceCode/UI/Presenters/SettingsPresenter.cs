@@ -56,7 +56,7 @@ namespace UI.Presenters
 
         private void OnCloseClicked(EventContext ctx)
         {
-            Close();
+            _popUpManager.Close<ISettingsPopUp>();
         }
 
         public void Dispose()

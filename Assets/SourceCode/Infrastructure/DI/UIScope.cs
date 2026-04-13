@@ -1,3 +1,4 @@
+using SourceCode.UI;
 using UI.Abstract;
 using UI.Manager;
 using UI.Presenters;
@@ -14,6 +15,7 @@ namespace Infrastructure.DI
             builder.RegisterEntryPoint<UIManager>();
             
             builder.Register<PopUpManager>(Lifetime.Singleton).As<IPopUpManager>();
+            builder.Register<ScreenTracker>(Lifetime.Singleton).As<IScreenTracker>();
             
             //! View
             builder.Register<MainMenuView>(Lifetime.Singleton);

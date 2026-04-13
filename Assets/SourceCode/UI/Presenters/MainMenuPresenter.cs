@@ -7,13 +7,13 @@ using UI.Views;
 
 namespace UI.Presenters
 {
-    public class MainMenuPresenter :IPresenter, IDisposable
+    public class MainMenuPresenter : IPresenter, IPopUpAware, IDisposable
     {
         public GameState TargetState => GameState.Menu;
-        
+
         private readonly MainMenuView _view;
         private readonly IGameStateService _gameStateService;
-        private readonly IPopUpManager  _popUpManager;
+        private readonly IPopUpManager _popUpManager;
 
         public MainMenuPresenter(
             MainMenuView view,
@@ -36,6 +36,10 @@ namespace UI.Presenters
 
         public void Show() => _view.Show();
         public void Hide() => _view.Hide();
+        
+        public void OnPopUpOpen() => _view.SetPopUpState(true);
+
+        public void OnPopUpClose()=> _view.SetPopUpState(false);
 
         private void OnPlayClicked(EventContext ctx)
             => _gameStateService.SetState(GameState.Playing);

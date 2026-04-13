@@ -30,8 +30,10 @@ namespace Entities.Player
 
         public void Jump()
         {
+            Debug.Log("jump1");
             if (groundChecker.IsGrounded())
             {
+                Debug.Log("jump2");
                 yVelocity = jumpForce;
                 isJumping = true;
             }

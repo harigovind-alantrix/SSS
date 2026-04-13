@@ -4,144 +4,64 @@ using UnityEngine;
 
 public class EndlessPlatformGenerator : MonoBehaviour
 {
-
-    // public PlatformPool pool;
-
-    // private Vector3 lastPlatformPos;
-
-    // [Header("Horizontal")]
-    // public float minXStep = 2f;
-    // public float maxXStep = 4f;
-
-    // [Header("Vertical")]
-    // public float minYStep = 3f;  // 🔥 important (no head hit)
-    // public float maxYStep = 6f;
-
-    // [Header("Spawn")]
-    // public int initialPlatforms = 6;
-
-    // private int direction = 1; // 🔥 controls zig-zag
-
-    // void Start()
-    // {
-    //     lastPlatformPos = Vector3.zero;
-
-    //     for (int i = 0; i < initialPlatforms; i++)
-    //     {
-    //         SpawnPlatform();
-    //     }
-    // }
-
-    // void Update()
-    // {
-    //     if (lastPlatformPos.y < transform.position.y + 15f)
-    //     {
-    //         SpawnPlatform();
-    //     }
-    // }
-
-    // void SpawnPlatform()
-    // {
-    //     GameObject platform = pool.GetPlatform();
-
-    //     // 🔥 Alternate direction (left/right)
-    //     direction *= -1;
-
-    //     float xStep = Random.Range(minXStep, maxXStep) * direction;
-    //     float yStep = Random.Range(minYStep, maxYStep);
-
-    //     // 🔥 Occasionally create harder jump
-    //     if (Random.value < 0.25f)
-    //     {
-    //         yStep += 2f; // higher jump
-    //     }
-
-    //     Vector3 newPos = new Vector3(
-    //         lastPlatformPos.x + xStep,
-    //         lastPlatformPos.y + yStep,
-    //         0f
-    //     );
-
-    //     platform.transform.position = newPos;
-
-    //     lastPlatformPos = newPos;
-    // }
     public PlatformPool pool;
 
-    private float currentY = 0f;
+    [Header("Start")]
+    public int initialPlatforms = 12;
 
-    [Header("Layer Settings")]
-    public float minYStep = 3f;
-    public float maxYStep = 6f;
+    [Header("Jump Distances")]
+    public float minXStep = 1.5f;
+    public float maxXStep = 4f;
 
-    [Header("Horizontal Spread")]
+    public float minYStep = 2.5f;
+    public float maxYStep = 4.5f;
+
+    [Header("Bounds")]
     public float minX = -5f;
     public float maxX = 5f;
 
-    [Header("Platforms Per Layer")]
-    public int minPlatforms = 2;
-    public int maxPlatforms = 4;
+    [Header("Spawn Ahead")]
+    public float spawnAheadY = 15f;
 
-    public int initialLayers = 5;
-    public float minVerticalClearance = 4f;
+    private float lastX = 0f;
+    private float lastY = 0f;
+
     void Start()
     {
-        for (int i = 0; i < initialLayers; i++)
-        {
-            SpawnLayer();
-        }
+        for (int i = 0; i < initialPlatforms; i++)
+            SpawnNextPlatform();
     }
 
     void Update()
     {
-        if (currentY < transform.position.y + 15f)
+        if (lastY < transform.position.y + spawnAheadY)
         {
-            SpawnLayer();
+            SpawnNextPlatform();
         }
     }
 
-    void SpawnLayer()
+    void SpawnNextPlatform()
     {
         float yStep = Random.Range(minYStep, maxYStep);
 
-        // 🔥 FORCE MINIMUM HEIGHT (NO OVERLAP EVER)
-        yStep = Mathf.Max(yStep, minVerticalClearance);
+        // choose left or right movement
+        float dir = Random.value > 0.5f ? 1f : -1f;
+        float xStep = Random.Range(minXStep, maxXStep) * dir;
 
-        currentY += yStep;
+        float newX = Mathf.Clamp(lastX + xStep, minX, maxX);
+        float newY = lastY + yStep;
 
-        int count = Random.Range(minPlatforms, maxPlatforms + 1);
-
-        List<float> usedXPositions = new List<float>();
-
-        for (int i = 0; i < count; i++)
+        // avoid straight vertical blocking
+        if (Mathf.Abs(newX - lastX) < 1f)
         {
-            GameObject platform = pool.GetPlatform();
-
-            float xPos;
-            int attempts = 0;
-
-            do
-            {
-                xPos = Random.Range(minX, maxX);
-                attempts++;
-            }
-            while (IsTooClose(xPos, usedXPositions) && attempts < 10);
-
-            usedXPositions.Add(xPos);
-
-            platform.transform.position = new Vector3(xPos, currentY, 0f);
-        }
-    }
-    bool IsTooClose(float newX, List<float> existingX)
-    {
-        float minDistance = 2.5f; // 🔥 tweak this
-
-        foreach (float x in existingX)
-        {
-            if (Mathf.Abs(newX - x) < minDistance)
-                return true;
+            newX += dir * 1.5f;
+            newX = Mathf.Clamp(newX, minX, maxX);
         }
 
-        return false;
+        GameObject platform = pool.GetPlatform();
+        platform.transform.position = new Vector3(newX, newY, 0f);
+
+        lastX = newX;
+        lastY = newY;
     }
 }

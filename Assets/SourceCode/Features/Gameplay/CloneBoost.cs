@@ -49,7 +49,7 @@ namespace Features.Gameplay
                 // 🔥 FIX: If no movement → ONLY UPWARD BOOST
                 if (boostDirection == Vector3.zero)
                 {
-                    boostMove = Vector3.up * (upwardForce * 1.3f) * Time.deltaTime;
+                    boostMove = Vector3.up * (upwardForce * 1.6f) * Time.deltaTime;
                 }
                 else
                 {

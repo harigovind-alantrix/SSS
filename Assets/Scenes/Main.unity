@@ -904,6 +904,7 @@ GameObject:
   - component: {fileID: 1000553928}
   - component: {fileID: 1000553927}
   - component: {fileID: 1000553935}
+  - component: {fileID: 1000553936}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -938,10 +939,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 622cd7b6789ad4088a5b61485efed69b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundDistance: 1
+  groundedDistance: 0.6
+  landingDistance: 1.2
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 192
   rayOffset: 0.6
 --- !u!114 &1000553928
 MonoBehaviour:
@@ -1077,6 +1079,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 360
+--- !u!114 &1000553936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000553925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdd6636a66de440d09fcc36789415ec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockZ: 1
+  fixedZ: 0
 --- !u!1 &1034662642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1781,14 +1797,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pool: {fileID: 2076873213}
+  initialPlatforms: 12
+  minXStep: 1.5
+  maxXStep: 4
   minYStep: 3
   maxYStep: 6
   minX: -5
   maxX: 5
-  minPlatforms: 2
-  maxPlatforms: 4
-  initialLayers: 5
-  minVerticalClearance: 4
+  spawnAheadY: 15
 --- !u!4 &2076873215
 Transform:
   m_ObjectHideFlags: 0

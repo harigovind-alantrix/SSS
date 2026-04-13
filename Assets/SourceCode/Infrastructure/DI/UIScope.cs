@@ -13,9 +13,13 @@ namespace Infrastructure.DI
         {
             builder.RegisterEntryPoint<UIManager>();
             
+            //! View
             builder.Register<MainMenuView>(Lifetime.Singleton);
-            builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();
+            builder.Register<SettingsView>(Lifetime.Singleton);
             
+            //! Presenter
+            builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();
+            builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPresenter>();
         }
     }
 }

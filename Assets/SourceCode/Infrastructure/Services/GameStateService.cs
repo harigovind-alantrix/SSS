@@ -13,7 +13,7 @@ namespace Infrastructure.Services
         private readonly IPublisher<OnGameStateChanged> _onGameStateChangedPublisher;
 
         private static readonly Dictionary<GameState, GameState[]> _allowed = new() {
-            { GameState.Menu,          new[] { GameState.Playing,GameState.Shop,GameState.Settings } },
+            { GameState.Menu,          new[] { GameState.Playing,} },
             { GameState.Playing,       new[] { GameState.Paused, GameState.GameOver, GameState.LevelComplete } },
             { GameState.Paused,        new[] { GameState.Playing, GameState.Menu } },
             { GameState.GameOver,      new[] { GameState.Menu } },

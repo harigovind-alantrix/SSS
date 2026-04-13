@@ -72,9 +72,9 @@ namespace Features.Gameplay
 
             // 🔥 Spawn clone
             GameObject clone = Instantiate(clonePrefab, spawnPos, spawnRot);
-
             // 🔥 Apply boost to clone
             CloneBoost boost = clone.GetComponent<CloneBoost>();
+
             if (boost != null)
             {
                 boost.ApplyBoost(direction);

@@ -13,14 +13,17 @@ namespace UI.Manager
     public class UIManager : IStartable, IDisposable
     {
         private readonly List<IPresenter> _presenters;
+        private readonly List<IPopUp> _popUps;
         private readonly ISubscriber<OnGameStateChanged> _subscriber;
         private IDisposable _subscription;
 
         public UIManager(
             IEnumerable<IPresenter> presenters,
+            IEnumerable<IPopUp> popUps,
             ISubscriber<OnGameStateChanged> subscriber)
         {
             _presenters = new List<IPresenter>(presenters);
+            _popUps = new List<IPopUp>(popUps);
             _subscriber = subscriber;
         }
 
@@ -33,6 +36,10 @@ namespace UI.Manager
             GRoot.inst.ApplyContentScaleFactor();
             GRoot.inst.MakeFullScreen();
 
+            foreach (var popUp in _popUps)
+            {
+                popUp.Initialize();
+            }
             foreach (var presenter in _presenters)
             {
                 presenter.Initialize();

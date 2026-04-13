@@ -1,3 +1,4 @@
+using System;
 using Core.Interfaces;
 using Core.Models;
 using FairyGUI;
@@ -6,35 +7,34 @@ using UI.Views;
 
 namespace UI.Presenters
 {
-    public class SettingsPresenter : IPresenter
+    public class SettingsPresenter : ISettingsPopUp ,IDisposable
     {
-        public GameState TargetState => GameState.Settings;
-
         private readonly SettingsView _view;
-        private readonly IGameStateService _gameStateService;
         private readonly IAudioService _audioService;
+        private readonly IPopUpManager _popUpManager;
 
         public SettingsPresenter(
             SettingsView view,
-            IGameStateService gameStateService,
-            IAudioService audioService)
+            IAudioService audioService,
+            IPopUpManager popUpManager)
         {
             _view = view;
-            _gameStateService = gameStateService;
             _audioService = audioService;
+            _popUpManager = popUpManager;
         }
 
         public void Initialize()
         {
+            _popUpManager.Register<ISettingsPopUp>(this);
+            
             _view.CreateUI();
             _view.MusicSlider.onChanged.Add(OnMusicSliderChanged);
             _view.SfxSlider.onChanged.Add(OnSfxSliderChanged);
             _view.MuteBtn.onClick.Add(OnMuteClicked);
             _view.CloseBtn.onClick.Add(OnCloseClicked);
         }
-
-        public void Show() => _view.Show();
-        public void Hide() => _view.Hide();
+        public void Open() => _view.Show();
+        public void Close() => _view.Hide();
         
         private void OnMusicSliderChanged(EventContext ctx)
         {
@@ -56,7 +56,15 @@ namespace UI.Presenters
 
         private void OnCloseClicked(EventContext ctx)
         {
-            _gameStateService.SetState(_gameStateService.PreviousState);
+            Close();
+        }
+
+        public void Dispose()
+        {
+            if(_view.MusicSlider != null)  _view.MusicSlider.onChanged.Remove(OnMusicSliderChanged);
+            if(_view.SfxSlider != null) _view.SfxSlider.onChanged.Remove(OnSfxSliderChanged);
+            if(_view.MuteBtn != null) _view.MuteBtn.onClick.Remove(OnMuteClicked);
+            if(_view.CloseBtn != null) _view.CloseBtn.onClick.Remove(OnCloseClicked);
         }
     }
 }

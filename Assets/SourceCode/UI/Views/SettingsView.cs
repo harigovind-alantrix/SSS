@@ -19,6 +19,8 @@ namespace UI.Views
             _sfxSlider = Panel.GetChild("SfxSlider").asSlider;
             _muteBtn = Panel.GetChild("MuteBtn").asButton;
             _backBtn = Panel.GetChild("BackBtn").asButton;
+            
+            Panel.sortingOrder = 10;
         }
         
         public GSlider MusicSlider => _musicSlider;

@@ -13,13 +13,16 @@ namespace UI.Presenters
         
         private readonly MainMenuView _view;
         private readonly IGameStateService _gameStateService;
+        private readonly IPopUpManager  _popUpManager;
 
         public MainMenuPresenter(
             MainMenuView view,
-          IGameStateService gameStateService)
+            IGameStateService gameStateService,
+            IPopUpManager popUpManager)
         {
             _view = view;
             _gameStateService = gameStateService;
+            _popUpManager = popUpManager;
         }
 
         public void Initialize()
@@ -38,10 +41,10 @@ namespace UI.Presenters
             => _gameStateService.SetState(GameState.Playing);
 
         private void OnShopClicked(EventContext ctx)
-            => _gameStateService.SetState(GameState.Shop);
+            => _popUpManager.Open<IShopPopUp>();
 
         private void OnSettingsClicked(EventContext ctx)
-            => _gameStateService.SetState(GameState.Settings);
+            => _popUpManager.Open<ISettingsPopUp>();
 
         private void OnExitClicked(EventContext ctx)
         {

@@ -21,7 +21,7 @@ namespace Infrastructure.DI
             
             //! Presenter
             builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();
-            builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPresenter>();
+            builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPopUp>();
         }
     }
 }

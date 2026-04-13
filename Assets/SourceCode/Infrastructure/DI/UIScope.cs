@@ -20,10 +20,15 @@ namespace Infrastructure.DI
             //! View
             builder.Register<MainMenuView>(Lifetime.Singleton);
             builder.Register<SettingsView>(Lifetime.Singleton);
+            builder.Register<PauseView>(Lifetime.Singleton);
             
             //! Presenter
-            builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();
+            builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();   
+            builder.Register<PausePresenter>(Lifetime.Singleton).As<IPresenter>();
+            
+            //! Popups
             builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPopUp>();
+        
         }
     }
 }

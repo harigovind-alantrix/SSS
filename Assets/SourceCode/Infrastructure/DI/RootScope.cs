@@ -4,6 +4,7 @@ using MessagePipe;
 using Core.Interfaces;
 using Core.Messages.System;
 using Infrastructure.Services;
+using Infrastructure.Services.Audio;
 
 namespace Infrastructure.DI
 {
@@ -20,6 +21,8 @@ namespace Infrastructure.DI
 
             //! Services
             builder.Register<GameStateService>(Lifetime.Singleton).As<IGameStateService>();
+            
+            builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
         }
     }
 }

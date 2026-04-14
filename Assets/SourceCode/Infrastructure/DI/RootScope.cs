@@ -2,6 +2,7 @@ using VContainer;
 using VContainer.Unity;
 using MessagePipe;
 using Core.Interfaces;
+using Core.Messages.Gameplay;
 using Core.Messages.System;
 using Infrastructure.Services;
 using Infrastructure.Services.Audio;
@@ -21,6 +22,7 @@ namespace Infrastructure.DI
             builder.RegisterMessageBroker<MoveInputEvent>(options);
             builder.RegisterMessageBroker<JumpInputEvent>(options);
             builder.RegisterMessageBroker<CloneInputEvent>(options);
+            builder.RegisterMessageBroker<CameraZoomEvent>(options);
 
             //! Services
             builder.Register<GameStateService>(Lifetime.Singleton).As<IGameStateService>();

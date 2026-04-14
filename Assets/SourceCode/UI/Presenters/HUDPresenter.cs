@@ -49,10 +49,10 @@ namespace UI.Presenters
 
         public void Dispose()
         {
-            if (_view.PauseButton != null) _view.PauseButton.onClick.Add(OnPauseClicked);
-            if (_view.RightButton != null) _view.RightButton.onClick.Add(OnRightClicked);
-            if (_view.LeftButton != null) _view.LeftButton.onClick.Add(OnLeftClicked);
-            if (_view.CloneButton != null) _view.CloneButton.onClick.Add(OnCloneClicked);
+            if (_view.PauseButton != null) _view.PauseButton.onClick.Remove(OnPauseClicked);
+            if (_view.RightButton != null) _view.RightButton.onClick.Remove(OnRightClicked);
+            if (_view.LeftButton != null) _view.LeftButton.onClick.Remove(OnLeftClicked);
+            if (_view.CloneButton != null) _view.CloneButton.onClick.Remove(OnCloneClicked);
         }
     }
 }

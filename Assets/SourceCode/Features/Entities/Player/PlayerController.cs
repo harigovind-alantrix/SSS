@@ -1,54 +1,67 @@
-using System.Collections;
-using System.Collections.Generic;
-using Core.Models;
-using Entities.Player;
+using System;
+using Core.Messages.Gameplay;
 using Features.Gameplay;
+using MessagePipe;
 using UnityEngine;
+using VContainer;
+
 namespace Entities.Player
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour ,IDisposable
     {
-        private PlayerMovement movement;
-        private PlayerJump jump;
-        private PlayerRotation rotation;
-        public CameraZoomController camerazoom;
-
-        private CloneManager clonemanager;
-
+        private PlayerMovement _movement;
+        private PlayerJump _jump;
+        private PlayerRotation _rotation;
+        
+        private IDisposable _subscriptions;
+        
+        [Inject]
+        public void Construct(
+            ISubscriber<MoveInputEvent> moveSubscriber,
+            ISubscriber<JumpInputEvent> jumpSubscriber)
+        {
+            var d = DisposableBag.CreateBuilder();
+ 
+            moveSubscriber.Subscribe(OnMove).AddTo(d);
+            jumpSubscriber.Subscribe(OnJump).AddTo(d);
+            _subscriptions = d.Build();
+        }
         void Awake()
         {
-            movement = GetComponent<PlayerMovement>();
-            jump = GetComponent<PlayerJump>();
-            rotation = GetComponent<PlayerRotation>();
-
-            // 🔥 Find CloneManager
-            clonemanager = FindObjectOfType<CloneManager>();
+            _movement = GetComponent<PlayerMovement>();
+            _jump = GetComponent<PlayerJump>();
+            _rotation = GetComponent<PlayerRotation>();
         }
-
-        void Update()
+        private void OnMove(MoveInputEvent evt)
         {
-            float moveInput = Input.GetAxis("Horizontal");
-
-
-            movement.Move(moveInput);
-            rotation.Rotate(moveInput);
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                jump.Jump();
-                camerazoom.ZoomIn();
-            }
-
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                clonemanager.HandleClone(); // trigger clone
-            }
+            _movement.Move(evt.Axis);
+            _rotation.Rotate(evt.Axis);
         }
-        public float GetCurrentInput()
+        private void OnJump(JumpInputEvent _)
         {
-            return Input.GetAxis("Horizontal");
+            _jump.Jump();
         }
-
+        public void Freeze()
+        {
+            Dispose();
+            
+            if (_movement != null) _movement.enabled = false;
+            if (_jump     != null) _jump.enabled     = false;
+            if (_rotation != null) _rotation.enabled = false;
+ 
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                rb.velocity        = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic     = true;
+            }
+        }
+ 
+        public void Dispose()
+        {
+            _subscriptions?.Dispose();
+        }
+ 
+        void OnDestroy() => Dispose();
     }
 }
-

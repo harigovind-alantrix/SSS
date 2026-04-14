@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using Entities.Player;
-using Features.Gameplay;
+using Core.Messages.Gameplay;
+using MessagePipe;
 using UnityEngine;
+using VContainer;
 
 namespace Entities.Player
 {
@@ -16,8 +15,14 @@ namespace Entities.Player
         private bool isJumping;
 
         private GroundChecker groundChecker;
-        public CameraZoomController camerazoom;
+        
+        private IPublisher<CameraZoomEvent> _zoomPublisher;
 
+        [Inject]
+        public void Construct(IPublisher<CameraZoomEvent> zoomPublisher)
+        {
+            _zoomPublisher = zoomPublisher;
+        }
         void Awake()
         {
             groundChecker = GetComponent<GroundChecker>();
@@ -30,12 +35,11 @@ namespace Entities.Player
 
         public void Jump()
         {
-            Debug.Log("jump1");
             if (groundChecker.IsGrounded())
             {
-                Debug.Log("jump2");
                 yVelocity = jumpForce;
                 isJumping = true;
+                _zoomPublisher?.Publish(new CameraZoomEvent(true));
             }
         }
         public bool IsJumping()
@@ -65,7 +69,7 @@ namespace Entities.Player
                         pos.y = groundY;
                         yVelocity = 0;
                         isJumping = false;
-                        camerazoom.ZoomOut();
+                        _zoomPublisher?.Publish(new CameraZoomEvent(false));
                     }
                 }
 

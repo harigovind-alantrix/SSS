@@ -20,8 +20,8 @@ GameObject:
   - component: {fileID: 3339621788499541355}
   - component: {fileID: 4142513824794710843}
   - component: {fileID: 1336926935484909563}
-  m_Layer: 7
-  m_Name: Cube (1)
+  m_Layer: 0
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,7 +162,6 @@ MonoBehaviour:
   jumpForce: 15
   gravity: -20
   playerHeight: 1
-  camerazoom: {fileID: 0}
 --- !u!114 &5557838877348129821
 MonoBehaviour:
   m_ObjectHideFlags: 0

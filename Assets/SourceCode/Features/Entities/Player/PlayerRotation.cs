@@ -1,28 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
+using Data.Configs;
 using Entities.Player;
 using UnityEngine;
 
 namespace Entities.Player
 {
-    public class PlayerRotation : MonoBehaviour
+    public class PlayerRotation
     {
-        public float rotationSpeed = 360f;
-
-        private PlayerJump jump;
+        private readonly Transform _transform;
+        private readonly PlayerConfig _config;
+        private readonly PlayerJump _jump;
+        
         private float currentZRotation = 0f;
 
-        void Awake()
+        public PlayerRotation(
+            Transform transform,
+            PlayerConfig config,
+            PlayerJump jump)
         {
-            jump = GetComponent<PlayerJump>();
+            _transform = transform;
+            _config    = config;
+            _jump      = jump;
         }
+
 
         public void Rotate(float moveInput)
         {
-            // 🔥 AIR ROTATION (UNCHANGED - KEEP YOUR FEEL)
-            if (jump.IsJumping())
+            if (_jump.IsJumping())
             {
-                currentZRotation += -moveInput * rotationSpeed * Time.deltaTime;
+                currentZRotation += -moveInput * _config.rotationSpeed * Time.deltaTime;
             }
             else
             {
@@ -48,8 +55,7 @@ namespace Entities.Player
             }
 
             // 🔥 APPLY ROTATION
-            transform.rotation = Quaternion.Euler(0f, 0f, currentZRotation);
+            _transform.rotation = Quaternion.Euler(0f, 0f, currentZRotation);
         }
     }
-
 }

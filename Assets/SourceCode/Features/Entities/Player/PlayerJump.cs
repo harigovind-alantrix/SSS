@@ -1,91 +1,92 @@
 using Core.Messages.Gameplay;
 using MessagePipe;
+using Data.Configs;
 using UnityEngine;
 using VContainer;
 
 namespace Entities.Player
 {
-    public class PlayerJump : MonoBehaviour
+    public class PlayerJump
     {
-        public float jumpForce = 10f;
-        public float gravity = -25f;
-        public float playerHeight = 1f;
+        private readonly Transform _transform;
+        private readonly PlayerConfig _config;
+        private readonly GroundChecker _groundChecker;
+        private readonly IPublisher<CameraZoomEvent> _zoomPublisher;
 
-        private float yVelocity;
-        private bool isJumping;
+        private float _yVelocity;
+        private bool _isJumping;
 
-        private GroundChecker groundChecker;
-        
-        private IPublisher<CameraZoomEvent> _zoomPublisher;
-
-        [Inject]
-        public void Construct(IPublisher<CameraZoomEvent> zoomPublisher)
+        public PlayerJump(
+            Transform transform,
+            PlayerConfig config,
+            GroundChecker groundChecker,
+            IPublisher<CameraZoomEvent> zoomPublisher)
         {
+            _config = config;
+            _transform = transform;
+            _groundChecker = groundChecker;
             _zoomPublisher = zoomPublisher;
         }
-        void Awake()
-        {
-            groundChecker = GetComponent<GroundChecker>();
-        }
 
-        void Update()
+
+        public void Tick()
         {
             HandleJumpMotion();
         }
 
         public void Jump()
         {
-            if (groundChecker.IsGrounded())
+            if (_groundChecker.IsGrounded())
             {
-                yVelocity = jumpForce;
-                isJumping = true;
+                _yVelocity = _config.jumpForce;
+                _isJumping = true;
                 _zoomPublisher?.Publish(new CameraZoomEvent(true));
             }
         }
+
         public bool IsJumping()
         {
-            return isJumping;
+            return _isJumping;
         }
 
-        void HandleJumpMotion()
+       private void HandleJumpMotion()
         {
-            Vector3 pos = transform.position;
+            Vector3 pos = _transform.position;
 
-            if (isJumping)
+            if (_isJumping)
             {
                 // Apply gravity only during jump
-                yVelocity += gravity * Time.deltaTime;
-                pos.y += yVelocity * Time.deltaTime;
+                _yVelocity += _config.gravity * Time.deltaTime;
+                pos.y += _yVelocity * Time.deltaTime;
 
                 // Check ground
                 RaycastHit hit;
-                if (groundChecker.TryGetGround(out hit))
+                if (_groundChecker.TryGetGround(out hit))
                 {
-                    float groundY = hit.point.y + (playerHeight / 2f);
+                    float groundY = hit.point.y + (_config.playerHeight / 2f);
 
                     // Land condition
                     if (pos.y <= groundY)
                     {
                         pos.y = groundY;
-                        yVelocity = 0;
-                        isJumping = false;
+                        _yVelocity = 0;
+                        _isJumping = false;
                         _zoomPublisher?.Publish(new CameraZoomEvent(false));
                     }
                 }
 
-                transform.position = pos;
+                _transform.position = pos;
             }
             else
             {
                 // Always stick to ground when not jumping
                 RaycastHit hit;
-                if (groundChecker.TryGetGround(out hit))
+                if (_groundChecker.TryGetGround(out hit))
                 {
-                    pos.y = hit.point.y + (playerHeight / 2f);
-                    transform.position = pos;
+                    pos.y = hit.point.y + (_config.playerHeight / 2f);
+                    _transform.position = pos;
                 }
             }
         }
     }
 }
-

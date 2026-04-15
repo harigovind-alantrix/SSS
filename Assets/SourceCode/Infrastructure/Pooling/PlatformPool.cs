@@ -6,6 +6,7 @@ public class PlatformPool : MonoBehaviour
 {
     public GameObject platformPrefab;
     public int poolSize = 20;
+    public Transform Container;
 
     private Queue<GameObject> pool = new Queue<GameObject>();
 
@@ -13,7 +14,7 @@ public class PlatformPool : MonoBehaviour
     {
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(platformPrefab);
+            GameObject obj = Instantiate(platformPrefab, Container);
             obj.SetActive(false);
             pool.Enqueue(obj);
         }
@@ -28,7 +29,7 @@ public class PlatformPool : MonoBehaviour
             return obj;
         }
 
-        GameObject newObj = Instantiate(platformPrefab);
+        GameObject newObj = Instantiate(platformPrefab, Container);
         return newObj;
     }
 

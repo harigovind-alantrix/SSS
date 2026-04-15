@@ -6,6 +6,7 @@ using MessagePipe;
 using Core.Models;
 using Entities.Player;
 using Core.Messages.Gameplay;
+using Data.Configs;
 using VContainer.Unity;
 
 namespace Features.Gameplay
@@ -16,10 +17,11 @@ namespace Features.Gameplay
         private readonly GameObject _clonePrefab;
         private readonly IObjectResolver _container;
         private readonly ISubscriber<CloneInputEvent> _cloneSubscriber;
-        
+        private readonly PlayerConfig _config;
+
         private GameObject _currentPlayer;
         private GameObject _lastPlayer;
-        
+
         private IDisposable _subscription;
 
         [Inject]
@@ -27,15 +29,18 @@ namespace Features.Gameplay
             ISubscriber<CloneInputEvent> cloneSubscriber,
             CinemachineVirtualCamera vcam,
             IObjectResolver container,
+            PlayerConfig config,
             [Key(InjectId.Player)] GameObject initialPlayer,
             [Key(InjectId.CubePrefab)] GameObject clonePrefab)
         {
             _cloneSubscriber = cloneSubscriber;
-            _vcam          = vcam;
-            _container     = container;
+            _vcam = vcam;
+            _container = container;
+            _config = config;
             _currentPlayer = initialPlayer;
-            _clonePrefab   = clonePrefab;
+            _clonePrefab = clonePrefab;
         }
+
         public void Initialize()
         {
             _subscription = _cloneSubscriber.Subscribe(OnCloneInput);
@@ -48,40 +53,37 @@ namespace Features.Gameplay
                 Debug.LogWarning("[CloneManager] No current player.");
                 return;
             }
- 
+
             PlayerController pc = _currentPlayer.GetComponent<PlayerController>();
             if (pc == null)
             {
                 Debug.LogWarning("[CloneManager] PlayerController missing.");
                 return;
             }
- 
-            Vector3 spawnPos    = _currentPlayer.transform.position;
+
+            Vector3 spawnPos = _currentPlayer.transform.position;
             Quaternion spawnRot = _currentPlayer.transform.rotation;
- 
+
             Vector3 direction = Mathf.Abs(evt.Axis) > 0.1f
                 ? new Vector3(evt.Axis, 0f, 0f).normalized
                 : Vector3.zero;
- 
+
             pc.Freeze();
- 
+
             GameObject clone = GameObject.Instantiate(_clonePrefab, spawnPos, spawnRot);
             _container.InjectGameObject(clone);
- 
-            CloneBoost boost = clone.GetComponent<CloneBoost>();
-            if (boost != null)
-                boost.ApplyBoost(direction);
-            else
-                Debug.LogWarning("[CloneManager] CloneBoost missing on clone prefab.");
- 
+
+            var boost = new CloneBoost(clone.transform, _config);
+            boost.ApplyBoost(direction);
+
             if (_vcam != null)
                 _vcam.Follow = clone.transform;
- 
+
             RemoveOldPlayer();
-            _lastPlayer    = _currentPlayer;
+            _lastPlayer = _currentPlayer;
             _currentPlayer = clone;
         }
- 
+
         private void RemoveOldPlayer()
         {
             if (_lastPlayer != null)
@@ -90,7 +92,7 @@ namespace Features.Gameplay
                 _lastPlayer = null;
             }
         }
- 
+
         public void Dispose()
         {
             _subscription?.Dispose();

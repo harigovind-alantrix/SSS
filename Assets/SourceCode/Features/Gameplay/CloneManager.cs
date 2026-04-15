@@ -44,6 +44,11 @@ namespace Features.Gameplay
         public void Initialize()
         {
             _subscription = _cloneSubscriber.Subscribe(OnCloneInput);
+            
+            if (_vcam != null && _currentPlayer != null)
+            {
+                _vcam.Follow = _currentPlayer.transform;
+            }
         }
 
         private void OnCloneInput(CloneInputEvent evt)

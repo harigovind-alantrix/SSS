@@ -1,27 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using Data.Configs;
 using UnityEngine;
+using Data.Configs;
+
 namespace Entities.Player
 {
     public class PlayerMovement
     {
-        private readonly Transform _playerTransform;
+        private readonly Rigidbody _rb;
         private readonly PlayerConfig _config;
 
-        public PlayerMovement(
-            Transform playerTransform,
-            PlayerConfig config)
+        public PlayerMovement(Rigidbody rb, PlayerConfig config)
         {
-            _playerTransform = playerTransform;
+            _rb = rb;
             _config = config;
         }
 
         public void Move(float input)
         {
-            Vector3 move = new Vector3(input, 0, 0);
-            _playerTransform.position += move * _config.moveSpeed * Time.deltaTime;
+            _rb.velocity = new Vector3(input * _config.moveSpeed, _rb.velocity.y, _rb.velocity.z);
         }
     }
 }
-

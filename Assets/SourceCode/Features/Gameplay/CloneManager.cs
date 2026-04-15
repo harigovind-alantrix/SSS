@@ -60,20 +60,19 @@ namespace Features.Gameplay
                 Debug.LogWarning("[CloneManager] PlayerController missing.");
                 return;
             }
-
-            Vector3 spawnPos = _currentPlayer.transform.position;
-            Quaternion spawnRot = _currentPlayer.transform.rotation;
-
+            
             Vector3 direction = Mathf.Abs(evt.Axis) > 0.1f
                 ? new Vector3(evt.Axis, 0f, 0f).normalized
                 : Vector3.zero;
+            
+            Vector3 spawnPos = _currentPlayer.transform.position + (direction * 0.6f);
+            Quaternion spawnRot = _currentPlayer.transform.rotation;
 
             pc.Freeze();
-
             GameObject clone = GameObject.Instantiate(_clonePrefab, spawnPos, spawnRot);
             _container.InjectGameObject(clone);
 
-            var boost = new CloneBoost(clone.transform, _config);
+            var boost = new CloneBoost(clone.GetComponent<Rigidbody>(), _config);
             boost.ApplyBoost(direction);
 
             if (_vcam != null)

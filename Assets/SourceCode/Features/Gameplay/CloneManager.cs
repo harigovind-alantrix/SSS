@@ -23,7 +23,7 @@ namespace Features.Gameplay
         private GameObject _lastPlayer;
 
         private IDisposable _subscription;
-
+        
         [Inject]
         public CloneManager(
             ISubscriber<CloneInputEvent> cloneSubscriber,
@@ -44,7 +44,7 @@ namespace Features.Gameplay
         public void Initialize()
         {
             _subscription = _cloneSubscriber.Subscribe(OnCloneInput);
-            
+
             if (_vcam != null && _currentPlayer != null)
             {
                 _vcam.Follow = _currentPlayer.transform;
@@ -65,12 +65,14 @@ namespace Features.Gameplay
                 Debug.LogWarning("[CloneManager] PlayerController missing.");
                 return;
             }
-            
+
             Vector3 direction = Mathf.Abs(evt.Axis) > 0.1f
                 ? new Vector3(evt.Axis, 0f, 0f).normalized
                 : Vector3.zero;
-            
-            Vector3 spawnPos = _currentPlayer.transform.position + (direction * 0.6f);
+
+            Vector3 spawnPos = _currentPlayer.transform.position
+                + (direction * _config.cloneSpawnOffset)
+                + Vector3.up * _config.cloneSpawnVerticalOffset;
             Quaternion spawnRot = _currentPlayer.transform.rotation;
 
             pc.Freeze();
@@ -92,7 +94,7 @@ namespace Features.Gameplay
         {
             if (_lastPlayer != null)
             {
-                GameObject.Destroy(_lastPlayer);
+                GameObject.DestroyImmediate(_lastPlayer);
                 _lastPlayer = null;
             }
         }

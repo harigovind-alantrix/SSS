@@ -28,6 +28,7 @@ namespace Entities.Player
             ISubscriber<JumpInputEvent> jumpSubscriber,
             IPublisher<CameraZoomEvent> zoomPublisher)
         {
+            _groundChecker = new GroundChecker();
             _movement = new PlayerMovement(_rigidbody, config);
             _jump = new PlayerJump(_rigidbody, config, _groundChecker, zoomPublisher);
             _rotation = new PlayerRotation(transform, config, _jump);
@@ -36,13 +37,6 @@ namespace Entities.Player
             moveSubscriber.Subscribe(OnMove).AddTo(d);
             jumpSubscriber.Subscribe(OnJump).AddTo(d);
             _subscriptions = d.Build();
-        }
-
-        void Awake()
-        {
-            _groundChecker = GetComponent<GroundChecker>();
-            
-            _rigidbody.useGravity = false; 
         }
         
         void Update()
@@ -81,7 +75,9 @@ namespace Entities.Player
             _rigidbody.angularVelocity = Vector3.zero;
             _rigidbody.isKinematic     = true;
         }
-
+        void OnCollisionEnter(Collision collision) => _groundChecker.OnCollisionEnter(collision);
+        void OnCollisionExit(Collision collision)  => _groundChecker.OnCollisionExit(collision);
+        
         public void Dispose()
         {
             _subscriptions?.Dispose();

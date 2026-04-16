@@ -20,6 +20,10 @@ namespace Data.Configs
         public float boostForce = 10f;
         public float upwardForce = 6f;
         public float boostDuration = 0.25f;
+        
+        [Header("Clone")]
+        public float cloneSpawnOffset = 0.6f; 
+        public float cloneSpawnVerticalOffset = 0.5f;
 
         [Header("Camera")]
         public float zoomSpeed = 5f;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using VContainer;
@@ -23,7 +24,7 @@ namespace Features.Gameplay
         private GameObject _lastPlayer;
 
         private IDisposable _subscription;
-        
+
         [Inject]
         public CloneManager(
             ISubscriber<CloneInputEvent> cloneSubscriber,
@@ -66,21 +67,46 @@ namespace Features.Gameplay
                 return;
             }
 
-            Vector3 direction = Mathf.Abs(evt.Axis) > 0.1f
+            Vector3 intendedDirection = Mathf.Abs(evt.Axis) > 0.1f
                 ? new Vector3(evt.Axis, 0f, 0f).normalized
                 : Vector3.zero;
 
-            Vector3 spawnPos = _currentPlayer.transform.position
-                + (direction * _config.cloneSpawnOffset)
-                + Vector3.up * _config.cloneSpawnVerticalOffset;
+            // Build fallback direction priority list
+            Vector3[] directionsToTry = GetDirectionPriority(intendedDirection);
+
+            Vector3 spawnPos = Vector3.zero;
+            Vector3 chosenDirection = Vector3.zero;
+            bool foundSpot = false;
+
+            foreach (Vector3 dir in directionsToTry)
+            {
+                if (TryGetSpawnPosition(_currentPlayer.transform.position, dir, out spawnPos))
+                {
+                    chosenDirection = dir;
+                    foundSpot = true;
+                    break;
+                }
+            }
+
+            if (!foundSpot)
+            {
+                Debug.Log("[CloneManager] No valid spawn direction found — clone blocked.");
+                return;
+            }
+
             Quaternion spawnRot = _currentPlayer.transform.rotation;
 
             pc.Freeze();
             GameObject clone = GameObject.Instantiate(_clonePrefab, spawnPos, spawnRot);
+
+            Rigidbody cloneRb = clone.GetComponent<Rigidbody>();
+            if (cloneRb != null)
+                cloneRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
             _container.InjectGameObject(clone);
 
-            var boost = new CloneBoost(clone.GetComponent<Rigidbody>(), _config);
-            boost.ApplyBoost(direction);
+            var boost = new CloneBoost(cloneRb, _config);
+            boost.ApplyBoost(chosenDirection);
 
             if (_vcam != null)
                 _vcam.Follow = clone.transform;
@@ -88,6 +114,106 @@ namespace Features.Gameplay
             RemoveOldPlayer();
             _lastPlayer = _currentPlayer;
             _currentPlayer = clone;
+        }
+
+        private Vector3[] GetDirectionPriority(Vector3 intended)
+        {
+            Vector3[] allDirections = new Vector3[]
+            {
+                new Vector3( 0f, 1f,  0f), // up
+                new Vector3( 1f, 0f,  0f), // right
+                new Vector3(-1f, 0f,  0f), // left
+                new Vector3( 0f, 0f,  1f), // forward
+                new Vector3( 0f, 0f, -1f), // back
+            };
+
+            if (intended == Vector3.zero)
+                return allDirections;
+
+            Vector3 opposite = -intended;
+
+            var priority = new List<Vector3>();
+            priority.Add(Vector3.up); 
+            priority.Add(intended);     
+            priority.Add(opposite);   
+
+            foreach (Vector3 dir in allDirections)
+            {
+                if (dir != Vector3.up && dir != intended && dir != opposite)
+                    priority.Add(dir);
+            }
+
+            return priority.ToArray();
+        }
+
+        private const float CubeHalfExtent = 0.5f;
+        private const float SpawnClearance = 0.05f;
+        private static readonly int GeometryMask = LayerMask.GetMask("Ground", "Platform");
+        
+        private bool TryGetSpawnPosition(Vector3 playerPos, Vector3 direction, out Vector3 result)
+        {
+            float lateralShift = (direction != Vector3.zero && direction != Vector3.up)
+                ? CubeHalfExtent * 1.2f
+                : 0f;
+
+            Vector3 candidate = direction == Vector3.up
+                ? playerPos + Vector3.up * (CubeHalfExtent * 2f + SpawnClearance)
+                : playerPos + direction * lateralShift;
+
+            Vector3 probeOrigin = candidate + Vector3.up * 0.1f;
+            
+            float floorY;
+            if (direction == Vector3.up)
+            {
+                
+                floorY = playerPos.y + CubeHalfExtent;
+            }
+            else if (Physics.SphereCast(new Ray(probeOrigin, Vector3.down), CubeHalfExtent,
+                    out RaycastHit floorHit, 20f, GeometryMask))
+            {
+                floorY = floorHit.point.y;
+            }
+            else
+            {
+                floorY = candidate.y - CubeHalfExtent;
+            }
+            
+            Vector3 floorSurface = new Vector3(candidate.x, floorY + CubeHalfExtent, candidate.z);
+            float ceilingY;
+            if (Physics.SphereCast(new Ray(floorSurface, Vector3.up), CubeHalfExtent,
+                    out RaycastHit ceilHit, 20f, GeometryMask))
+            {
+                ceilingY = ceilHit.point.y;
+            }
+            else
+            {
+                ceilingY = float.MaxValue;
+            }
+            
+            float gap = ceilingY - floorY;
+            float requiredGap = CubeHalfExtent * 2f + SpawnClearance * 2f;
+
+            if (gap < requiredGap)
+            {
+                result = Vector3.zero;
+                return false;
+            }
+            
+            Vector3 spawnCenter = new Vector3(candidate.x, floorY + CubeHalfExtent + SpawnClearance, candidate.z);
+            Vector3 halfExtents = Vector3.one * (CubeHalfExtent - 0.01f);
+            Collider[] overlaps = Physics.OverlapBox(spawnCenter, halfExtents, Quaternion.identity);
+
+            foreach (Collider col in overlaps)
+            {
+                if (_currentPlayer != null && col.transform.IsChildOf(_currentPlayer.transform))
+                    continue;
+                
+                result = Vector3.zero;
+                return false;
+            }
+
+            result = spawnCenter;
+            return true;
         }
 
         private void RemoveOldPlayer()

@@ -17,9 +17,11 @@ MonoBehaviour:
   gravity: -25
   playerHeight: 1
   rotationSpeed: 360
-  boostForce: 10
-  upwardForce: 6
+  boostForce: 5
+  upwardForce: 5
   boostDuration: 0.25
+  cloneSpawnOffset: 0.6
+  cloneSpawnVerticalOffset: 0.5
   zoomSpeed: 5
   zoomInFOV: 60
   zoomOutFOV: 48

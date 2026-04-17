@@ -38,7 +38,7 @@ namespace Entities.Player
             jumpSubscriber.Subscribe(OnJump).AddTo(d);
             _subscriptions = d.Build();
         }
-        
+          
         void Update()
         {
             if(_frozen) return;

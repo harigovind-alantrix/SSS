@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1865797295671771973}
   - component: {fileID: -2447260687366734879}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Platform
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 38a9d606c2b7b4bc2ad03ede988ddc62,
         type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38a9d606c2b7b4bc2ad03ede988ddc62, type: 3}
@@ -157,7 +157,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2534964839176971238, guid: 38a9d606c2b7b4bc2ad03ede988ddc62, type: 3}
 --- !u!4 &5729375620055479161 stripped

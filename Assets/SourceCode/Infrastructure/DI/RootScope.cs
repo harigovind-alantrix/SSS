@@ -20,6 +20,11 @@ namespace Infrastructure.DI
             });
             builder.RegisterMessageBroker<OnGameStateChanged>(options);
             builder.RegisterMessageBroker<OnGameStarted>(options);
+
+            //? Progression
+            builder.RegisterMessageBroker<OnCoinsChanged>(options);
+
+            //? Gameplay
             builder.RegisterMessageBroker<MoveInputEvent>(options);
             builder.RegisterMessageBroker<JumpInputEvent>(options);
             builder.RegisterMessageBroker<CloneInputEvent>(options);
@@ -27,7 +32,7 @@ namespace Infrastructure.DI
 
             //! Services
             builder.Register<GameStateService>(Lifetime.Singleton).As<IGameStateService>();
-            
+
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
         }
     }

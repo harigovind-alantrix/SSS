@@ -4,21 +4,28 @@ using UnityEngine;
 
 public class PlatformAutoReturn : MonoBehaviour
 {
-    public float destroyY = -10f;
+
+    private float returnDistanceBelowCamera = 30f;
 
     private PlatformPool pool;
+    private Camera mainCam;
 
     void Start()
     {
         pool = FindObjectOfType<PlatformPool>();
+        mainCam = Camera.main;
     }
 
     void Update()
     {
-        if (transform.position.y < destroyY)
+        if (pool == null || mainCam == null) return;
+
+        float limitY = mainCam.transform.position.y - returnDistanceBelowCamera;
+
+        if (transform.position.y < limitY)
         {
             pool.ReturnPlatform(gameObject);
         }
     }
-
+    
 }

@@ -5,6 +5,8 @@ using UnityEngine;
 public class EndlessPlatformGenerator : MonoBehaviour
 {
     public PlatformPool pool;
+    [Header("Target Player")]
+    public Transform targetPlayer;
 
     [Header("Start")]
     public int initialPlatforms = 12;
@@ -34,7 +36,8 @@ public class EndlessPlatformGenerator : MonoBehaviour
 
     void Update()
     {
-        if (lastY < transform.position.y + spawnAheadY)
+        if (targetPlayer == null) return;
+        if (lastY < targetPlayer.position.y + spawnAheadY)
         {
             SpawnNextPlatform();
         }
@@ -63,5 +66,11 @@ public class EndlessPlatformGenerator : MonoBehaviour
 
         lastX = newX;
         lastY = newY;
+
     }
+    public void SetTarget(Transform newTarget)
+    {
+        targetPlayer = newTarget;
+    }
+   
 }

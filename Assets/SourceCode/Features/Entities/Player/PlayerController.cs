@@ -11,11 +11,11 @@ namespace Entities.Player
     public class PlayerController : MonoBehaviour, IDisposable
     {
         [SerializeField] private Rigidbody _rigidbody;
-        
+
         private PlayerMovement _movement;
         private PlayerJump _jump;
         private PlayerRotation _rotation;
-        private GroundChecker  _groundChecker; 
+        private GroundChecker _groundChecker;
 
         private IDisposable _subscriptions;
         private float _lastMoveAxis;
@@ -38,14 +38,14 @@ namespace Entities.Player
             jumpSubscriber.Subscribe(OnJump).AddTo(d);
             _subscriptions = d.Build();
         }
-          
+
         void Update()
         {
-            if(_frozen) return;
+            if (_frozen) return;
             _rotation?.Rotate(_lastMoveAxis);
         }
 
-        void FixedUpdate() 
+        void FixedUpdate()
         {
             if (_frozen) return;
 
@@ -60,7 +60,7 @@ namespace Entities.Player
         }
 
         private void OnMove(MoveInputEvent evt) => _lastMoveAxis = evt.Axis;
-        
+
         private void OnJump(JumpInputEvent _) => _jumpRequested = true;
 
         public void Freeze()
@@ -70,14 +70,14 @@ namespace Entities.Player
             _movement = null;
             _jump = null;
             _rotation = null;
-            
-            _rigidbody.velocity        = Vector3.zero;
+
+            _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
-            _rigidbody.isKinematic     = true;
+            _rigidbody.isKinematic = true;
         }
         void OnCollisionEnter(Collision collision) => _groundChecker.OnCollisionEnter(collision);
-        void OnCollisionExit(Collision collision)  => _groundChecker.OnCollisionExit(collision);
-        
+        void OnCollisionExit(Collision collision) => _groundChecker.OnCollisionExit(collision);
+
         public void Dispose()
         {
             _subscriptions?.Dispose();

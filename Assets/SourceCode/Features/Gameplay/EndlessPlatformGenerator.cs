@@ -72,5 +72,4 @@ public class EndlessPlatformGenerator : MonoBehaviour
     {
         targetPlayer = newTarget;
     }
-   
 }

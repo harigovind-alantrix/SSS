@@ -19,6 +19,7 @@ namespace Infrastructure.DI
                 options.EnableCaptureStackTrace = true;
             });
             builder.RegisterMessageBroker<OnGameStateChanged>(options);
+            builder.RegisterMessageBroker<OnGameStarted>(options);
             builder.RegisterMessageBroker<MoveInputEvent>(options);
             builder.RegisterMessageBroker<JumpInputEvent>(options);
             builder.RegisterMessageBroker<CloneInputEvent>(options);

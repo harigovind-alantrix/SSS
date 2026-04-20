@@ -1,54 +1,63 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Cinemachine;
-using VContainer;
-using MessagePipe;
-using Core.Models;
-using Entities.Player;
 using Core.Messages.Gameplay;
+using Core.Messages.System;
+using Core.Models;
 using Data.Configs;
+using Entities.Player;
+using MessagePipe;
+using UnityEngine;
+using VContainer;
 using VContainer.Unity;
 
 namespace Features.Gameplay
 {
-    public class CloneManager : IInitializable, IDisposable
+    public class SpawnManager : IInitializable, IDisposable
     {
-        private readonly CinemachineVirtualCamera _vcam;
-        private readonly GameObject _clonePrefab;
         private readonly IObjectResolver _container;
+
+        private readonly ISubscriber<OnGameStateChanged> _gameStateSubscriber;
         private readonly ISubscriber<CloneInputEvent> _cloneSubscriber;
+        private readonly CinemachineVirtualCamera _vcam;
         private readonly PlayerConfig _config;
+        private readonly Transform _spawnPoint;
 
         private GameObject _currentPlayer;
         private GameObject _lastPlayer;
-
         private IDisposable _subscription;
 
-        [Inject]
-        public CloneManager(
+        public SpawnManager(
+            IObjectResolver container,
+            ISubscriber<OnGameStateChanged> gameStateSubscriber,
             ISubscriber<CloneInputEvent> cloneSubscriber,
             CinemachineVirtualCamera vcam,
-            IObjectResolver container,
             PlayerConfig config,
-            [Key(InjectId.Player)] GameObject initialPlayer,
-            [Key(InjectId.CubePrefab)] GameObject clonePrefab)
+            [Key(InjectId.SpawnPoint)] Transform spawnPoint)
         {
+            _container = container;
+            _gameStateSubscriber = gameStateSubscriber;
             _cloneSubscriber = cloneSubscriber;
             _vcam = vcam;
-            _container = container;
             _config = config;
-            _currentPlayer = initialPlayer;
-            _clonePrefab = clonePrefab;
+            _spawnPoint = spawnPoint;
         }
 
         public void Initialize()
         {
-            _subscription = _cloneSubscriber.Subscribe(OnCloneInput);
+            var disposableBag = DisposableBag.CreateBuilder();
+            _gameStateSubscriber.Subscribe(OnGameStateChanged).AddTo(disposableBag);
+            _cloneSubscriber.Subscribe(OnCloneInput).AddTo(disposableBag);
+            _subscription = disposableBag.Build();
+        }
 
-            if (_vcam != null && _currentPlayer != null)
+        private void OnGameStateChanged(OnGameStateChanged message)
+        {
+            if (message.CurrentState == GameState.Playing)
             {
-                _vcam.Follow = _currentPlayer.transform;
+                if (_currentPlayer != null) GameObject.Destroy(_currentPlayer);
+                if (_lastPlayer != null) GameObject.Destroy(_lastPlayer);
+                SpawnPlayer(_spawnPoint.position, _spawnPoint.rotation);
             }
         }
 
@@ -97,34 +106,46 @@ namespace Features.Gameplay
             Quaternion spawnRot = _currentPlayer.transform.rotation;
 
             pc.Freeze();
-            GameObject clone = GameObject.Instantiate(_clonePrefab, spawnPos, spawnRot);
+            if (_lastPlayer != null)
+            {
+                GameObject.Destroy(_lastPlayer);
+            }
 
-            Rigidbody cloneRb = clone.GetComponent<Rigidbody>();
-            if (cloneRb != null)
-                cloneRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            _lastPlayer = _currentPlayer;
+            SpawnPlayer(spawnPos, spawnRot);
 
-            _container.InjectGameObject(clone);
-
+            Rigidbody cloneRb = _currentPlayer.GetComponent<Rigidbody>();
             var boost = new CloneBoost(cloneRb, _config);
             boost.ApplyBoost(chosenDirection);
+        }
+
+        //! Helpers
+
+        private void SpawnPlayer(Vector3 position, Quaternion rotation)
+        {
+            _currentPlayer = GameObject.Instantiate(_config.playerPrefab, position, rotation);
+
+            Rigidbody rb = _currentPlayer.GetComponent<Rigidbody>();
+            if (rb != null)
+                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+            _container.InjectGameObject(_currentPlayer);
 
             if (_vcam != null)
-                _vcam.Follow = clone.transform;
+                _vcam.Follow = _currentPlayer.transform;
 
-            RemoveOldPlayer();
-            _lastPlayer = _currentPlayer;
-            _currentPlayer = clone;
+            Debug.Log($"[SpawnManager] Player spawned at {position}");
         }
 
         private Vector3[] GetDirectionPriority(Vector3 intended)
         {
             Vector3[] allDirections = new Vector3[]
             {
-                new Vector3( 0f, 1f,  0f), // up
-                new Vector3( 1f, 0f,  0f), // right
-                new Vector3(-1f, 0f,  0f), // left
-                new Vector3( 0f, 0f,  1f), // forward
-                new Vector3( 0f, 0f, -1f), // back
+                new Vector3(0f, 1f, 0f), // up
+                new Vector3(1f, 0f, 0f), // right
+                new Vector3(-1f, 0f, 0f), // left
+                new Vector3(0f, 0f, 1f), // forward
+                new Vector3(0f, 0f, -1f), // back
             };
 
             if (intended == Vector3.zero)
@@ -133,9 +154,9 @@ namespace Features.Gameplay
             Vector3 opposite = -intended;
 
             var priority = new List<Vector3>();
-            priority.Add(Vector3.up); 
-            priority.Add(intended);     
-            priority.Add(opposite);   
+            priority.Add(Vector3.up);
+            priority.Add(intended);
+            priority.Add(opposite);
 
             foreach (Vector3 dir in allDirections)
             {
@@ -149,7 +170,7 @@ namespace Features.Gameplay
         private const float CubeHalfExtent = 0.5f;
         private const float SpawnClearance = 0.05f;
         private static readonly int GeometryMask = LayerMask.GetMask("Ground", "Platform");
-        
+
         private bool TryGetSpawnPosition(Vector3 playerPos, Vector3 direction, out Vector3 result)
         {
             float lateralShift = (direction != Vector3.zero && direction != Vector3.up)
@@ -161,15 +182,14 @@ namespace Features.Gameplay
                 : playerPos + direction * lateralShift;
 
             Vector3 probeOrigin = candidate + Vector3.up * 0.1f;
-            
+
             float floorY;
             if (direction == Vector3.up)
             {
-                
                 floorY = playerPos.y + CubeHalfExtent;
             }
             else if (Physics.SphereCast(new Ray(probeOrigin, Vector3.down), CubeHalfExtent,
-                    out RaycastHit floorHit, 20f, GeometryMask))
+                         out RaycastHit floorHit, 20f, GeometryMask))
             {
                 floorY = floorHit.point.y;
             }
@@ -177,7 +197,7 @@ namespace Features.Gameplay
             {
                 floorY = candidate.y - CubeHalfExtent;
             }
-            
+
             Vector3 floorSurface = new Vector3(candidate.x, floorY + CubeHalfExtent, candidate.z);
             float ceilingY;
             if (Physics.SphereCast(new Ray(floorSurface, Vector3.up), CubeHalfExtent,
@@ -189,7 +209,7 @@ namespace Features.Gameplay
             {
                 ceilingY = float.MaxValue;
             }
-            
+
             float gap = ceilingY - floorY;
             float requiredGap = CubeHalfExtent * 2f + SpawnClearance * 2f;
 
@@ -198,7 +218,7 @@ namespace Features.Gameplay
                 result = Vector3.zero;
                 return false;
             }
-            
+
             Vector3 spawnCenter = new Vector3(candidate.x, floorY + CubeHalfExtent + SpawnClearance, candidate.z);
             Vector3 halfExtents = Vector3.one * (CubeHalfExtent - 0.01f);
             Collider[] overlaps = Physics.OverlapBox(spawnCenter, halfExtents, Quaternion.identity);
@@ -207,22 +227,13 @@ namespace Features.Gameplay
             {
                 if (_currentPlayer != null && col.transform.IsChildOf(_currentPlayer.transform))
                     continue;
-                
+
                 result = Vector3.zero;
                 return false;
             }
 
             result = spawnCenter;
             return true;
-        }
-
-        private void RemoveOldPlayer()
-        {
-            if (_lastPlayer != null)
-            {
-                GameObject.DestroyImmediate(_lastPlayer);
-                _lastPlayer = null;
-            }
         }
 
         public void Dispose()

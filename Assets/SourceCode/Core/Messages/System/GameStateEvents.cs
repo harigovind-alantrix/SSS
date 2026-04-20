@@ -13,4 +13,9 @@ namespace Core.Messages.System
             CurrentState = currentState;
         }
     }
+
+    public readonly struct OnGameStarted
+    {
+        
+    }
 }

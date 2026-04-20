@@ -739,75 +739,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &767314741
-PrefabInstance:
+--- !u!1 &685540770
+GameObject:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 13
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.94
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 949588718304351787, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4782842002824387290, guid: 63bfb90e1835244cf9e7dce621c77718,
-        type: 3}
-      propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 63bfb90e1835244cf9e7dce621c77718, type: 3}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 685540771}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &685540771
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685540770}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.94, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -919,12 +881,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1056909762 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4782842002824387290, guid: 63bfb90e1835244cf9e7dce621c77718,
-    type: 3}
-  m_PrefabInstance: {fileID: 767314741}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1096754305
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1158,10 +1114,8 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   vcam: {fileID: 1787260955}
-  initialPlayer: {fileID: 1056909762}
-  clonePrefab: {fileID: 4782842002824387290, guid: 63bfb90e1835244cf9e7dce621c77718,
-    type: 3}
   playerConfig: {fileID: 11400000, guid: 13432f6b081f74ec1bdb9b0bcfd13030, type: 2}
+  spawnPoint: {fileID: 685540771}
 --- !u!1 &1398819609
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,9 @@ namespace Data.Configs
     [CreateAssetMenu(fileName = "PlayerConfig", menuName = "Config/PlayerConfig", order = 0)]
     public class PlayerConfig : ScriptableObject
     {
+        [Header("Prefabs")]
+        public GameObject playerPrefab;
+
         [Header("Movement")]
         public float moveSpeed = 8f;
 
@@ -20,9 +23,9 @@ namespace Data.Configs
         public float boostForce = 10f;
         public float upwardForce = 6f;
         public float boostDuration = 0.25f;
-        
+
         [Header("Clone")]
-        public float cloneSpawnOffset = 0.6f; 
+        public float cloneSpawnOffset = 0.6f;
         public float cloneSpawnVerticalOffset = 0.5f;
 
         [Header("Camera")]

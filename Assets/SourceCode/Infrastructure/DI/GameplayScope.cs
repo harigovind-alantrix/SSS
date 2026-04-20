@@ -3,7 +3,6 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using Core.Models;
-using Entities.Player;
 using Features.Gameplay;
 using Infrastructure.Services;
 using Data.Configs;
@@ -15,6 +14,7 @@ namespace Infrastructure.DI
         [SerializeField] private CinemachineVirtualCamera vcam;
         [SerializeField] private PlayerConfig playerConfig;
         [SerializeField] private Transform spawnPoint;
+        
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<InputService>();

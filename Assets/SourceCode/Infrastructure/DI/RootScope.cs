@@ -4,13 +4,17 @@ using MessagePipe;
 using Core.Interfaces;
 using Core.Messages.Gameplay;
 using Core.Messages.System;
+using Data.Configs;
 using Infrastructure.Services;
 using Infrastructure.Services.Audio;
+using UnityEngine;
 
 namespace Infrastructure.DI
 {
     public class RootScope : LifetimeScope
     {
+        [SerializeField] private ShopConfig shopConfig;
+        
         protected override void Configure(IContainerBuilder builder)
         {
             //! Message Pipe
@@ -32,8 +36,11 @@ namespace Infrastructure.DI
 
             //! Services
             builder.Register<GameStateService>(Lifetime.Singleton).As<IGameStateService>();
-
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
+            builder.Register<PlayerPrefsSaveService>(Lifetime.Singleton).As<ISaveService>();
+            builder.Register<ProgressionService>(Lifetime.Singleton).As<IProgressionService>();
+            builder.Register<ShopService>(Lifetime.Singleton).As<IShopService>();
+            builder.RegisterInstance(shopConfig);
         }
     }
 }

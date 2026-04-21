@@ -5,6 +5,7 @@ using Core.Models;
 using Cysharp.Threading.Tasks;
 using FairyGUI;
 using UI.Abstract;
+using UI.Shop;
 using UI.Views;
 using UnityEngine;
 
@@ -16,26 +17,23 @@ namespace UI.Presenters
         private readonly IPopUpManager _popUpManager;
         private readonly IShopService _shopService;
         private readonly IProgressionService _progression;
-
-        private Camera _previewCamera;
-        private RenderTexture _renderTexture;
-        private GameObject _currentPreviewInstance;
-
-        private CancellationTokenSource _cts;
-
-        private const float RotationSpeed = 45f;
-        private int _index;
+        private readonly ShopNavigator _navigator;
+        private readonly ShopPreviewRenderer _previewRenderer;
 
         public ShopPresenter(
             ShopView view,
             IPopUpManager popUpManager,
             IShopService shopService,
-            IProgressionService progression)
+            IProgressionService progression,
+            ShopNavigator navigator,
+            ShopPreviewRenderer previewRenderer)
         {
             _view = view;
             _popUpManager = popUpManager;
             _shopService = shopService;
             _progression = progression;
+            _navigator = navigator;
+            _previewRenderer = previewRenderer;
         }
 
         public void Initialize()
@@ -49,50 +47,39 @@ namespace UI.Presenters
             _view.SelectButton.onClick.Add(OnSelect);
             _view.CloseButton.onClick.Add(OnClose);
 
-            SetupPreviewCamera();
+            _previewRenderer.Initialize();
         }
 
         public void Open()
         {
             Debug.Log($"[Shop] Coins: {_progression.Coins}");
-            var selected = _shopService.GetSelected();
-
-            _index = 0;
-            for (int i = 0; i < _shopService.Items.Count; i++)
-            {
-                if (_shopService.Items[i].id == selected.id)
-                {
-                    _index = i;
-                    break;
-                }
-            }
-
+            _navigator.SyncToSelected();
             RefreshDisplay();
             _view.Show();
         }
 
         public void Close()
         {
+            _previewRenderer.Hide();
             _view.Hide();
         }
-
-        //! ---
         private void OnPrev(EventContext ctx)
         {
-            _index = Mathf.Max(0, _index - 1);
+            _navigator.Prev();
             RefreshDisplay();
         }
 
         private void OnNext(EventContext ctx)
         {
-            _index = Mathf.Min(_shopService.Items.Count - 1, _index + 1);
+            _navigator.Next();
             RefreshDisplay();
         }
 
         private void OnBuy(EventContext ctx)
         {
-            Debug.Log($"[Shop] Attempting purchase of {CurrentItem().id}, price {CurrentItem().price}, coins {_progression.Coins}");
-            if (_shopService.TryPurchase(CurrentItem().id))
+            Debug.Log(
+                $"[Shop] Attempting purchase of {_navigator.Current.id}, price {_navigator.Current.price}, coins {_progression.Coins}");
+            if (_shopService.TryPurchase(_navigator.Current.id))
                 RefreshDisplay();
             else
                 Debug.Log("[Shop] Purchase failed");
@@ -100,7 +87,7 @@ namespace UI.Presenters
 
         private void OnSelect(EventContext ctx)
         {
-            _shopService.Select(CurrentItem().id);
+            _shopService.Select(_navigator.Current.id);
             RefreshDisplay();
         }
 
@@ -108,101 +95,20 @@ namespace UI.Presenters
         {
             _popUpManager.Close<IShopPopUp>();
         }
-
-        //! ---
+        
         private void RefreshDisplay()
         {
-            var item = CurrentItem();
+            var item = _navigator.Current;
             var selected = _shopService.GetSelected();
 
             _view.SetPrice(item.price);
             _view.SetCoins(_progression.Coins);
             _view.RefreshActionButton(item.isOwned, item.id == selected.id);
-            
-            _view.PreviousButton.enabled = _index > 0;
-            _view.NextButton.enabled = _index < _shopService.Items.Count - 1;
 
-            SpawnPreview(item.prefab);
-        }
+            _view.PreviousButton.enabled = _navigator.HasPrev;
+            _view.NextButton.enabled = _navigator.HasNext;
 
-        private ShopItem CurrentItem() => _shopService.Items[_index];
-
-        private void SetupPreviewCamera()
-        {
-            var go = new GameObject("[ShopPreviewCam]");
-            _previewCamera = go.AddComponent<Camera>();
-            _previewCamera.clearFlags = CameraClearFlags.SolidColor;
-            _previewCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
-            _previewCamera.orthographic = true;
-            _previewCamera.orthographicSize = 1.2f;
-            _previewCamera.cullingMask = LayerMask.GetMask("ShopPreview");
-            _previewCamera.enabled = false;
-            _previewCamera.nearClipPlane = 0.1f;
-            _previewCamera.farClipPlane = 100f;
-
-            go.transform.position = new Vector3(999f, 999f, -4f);
-            go.transform.LookAt(new Vector3(999f, 999f, 999f));
-
-            _renderTexture = new RenderTexture(725, 550, 16);
-            _previewCamera.targetTexture = _renderTexture;
-        }
-
-        private void SpawnPreview(GameObject prefab)
-        {
-            StopRotation();
-            ClearPreviewInstance();
-
-            if (prefab == null) return;
-
-            _currentPreviewInstance = GameObject.Instantiate(
-                prefab,
-                new Vector3(999f, 999f, 999f),
-                Quaternion.Euler(15f, 0f, 0f));
-
-            SetLayerRecursive(_currentPreviewInstance, LayerMask.NameToLayer("ShopPreview"));
-
-            _view.PreviewLoader.texture = new NTexture(_renderTexture);
-
-            _cts = new CancellationTokenSource();
-            RotateLoopAsync(_cts.Token).Forget();
-        }
-
-        private async UniTaskVoid RotateLoopAsync(CancellationToken ct)
-        {
-            while (!ct.IsCancellationRequested)
-            {
-                if (_currentPreviewInstance == null) return;
-
-                _currentPreviewInstance.transform.Rotate(
-                    Vector3.up, RotationSpeed * Time.deltaTime, Space.World);
-
-                _previewCamera.enabled = true;
-                _previewCamera.Render();
-                _previewCamera.enabled = false;
-
-                await UniTask.Yield(PlayerLoopTiming.Update, ct);
-            }
-        }
-
-        private void StopRotation()
-        {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-        }
-
-        private void ClearPreviewInstance()
-        {
-            if (_currentPreviewInstance == null) return;
-            GameObject.Destroy(_currentPreviewInstance);
-            _currentPreviewInstance = null;
-        }
-
-        private static void SetLayerRecursive(GameObject go, int layer)
-        {
-            go.layer = layer;
-            foreach (Transform child in go.transform)
-                SetLayerRecursive(child.gameObject, layer);
+            _previewRenderer.Show(item.prefab,_view.PreviewLoader);
         }
 
         public void Dispose()
@@ -213,17 +119,7 @@ namespace UI.Presenters
             if (_view.SelectButton != null) _view.SelectButton.onClick.Remove(OnSelect);
             if (_view.CloseButton != null) _view.CloseButton.onClick.Remove(OnClose);
 
-            StopRotation();
-            ClearPreviewInstance();
-
-            if (_previewCamera != null)
-                GameObject.Destroy(_previewCamera.gameObject);
-
-            if (_renderTexture != null)
-            {
-                _renderTexture.Release();
-                _renderTexture = null;
-            }
+            _previewRenderer.Dispose();
         }
     }
 }

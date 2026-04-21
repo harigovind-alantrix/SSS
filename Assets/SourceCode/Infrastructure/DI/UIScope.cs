@@ -2,6 +2,7 @@ using SourceCode.UI;
 using UI.Abstract;
 using UI.Manager;
 using UI.Presenters;
+using UI.Shop;
 using UI.Views;
 using VContainer;
 using VContainer.Unity;
@@ -32,7 +33,10 @@ namespace Infrastructure.DI
             //! Popups
             builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPopUp>();
             builder.Register<ShopPresenter>(Lifetime.Singleton).As<IPopUp>();
-        
+            
+            //! Shop
+            builder.Register<ShopNavigator>(Lifetime.Singleton);
+            builder.Register<ShopPreviewRenderer>(Lifetime.Singleton);
         }
     }
 }

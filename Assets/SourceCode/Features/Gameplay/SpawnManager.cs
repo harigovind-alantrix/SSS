@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cinemachine;
+using Core.Interfaces;
 using Core.Messages.Gameplay;
 using Core.Messages.System;
 using Core.Models;
@@ -16,13 +17,13 @@ namespace Features.Gameplay
     public class SpawnManager : IInitializable, IDisposable
     {
         private readonly IObjectResolver _container;
-
         private readonly ISubscriber<OnGameStateChanged> _gameStateSubscriber;
         private readonly ISubscriber<CloneInputEvent> _cloneSubscriber;
+        private readonly IShopService  _shopService;
         private readonly CinemachineVirtualCamera _vcam;
         private readonly PlayerConfig _config;
         private readonly Transform _spawnPoint;
-
+        
         private GameObject _currentPlayer;
         private GameObject _lastPlayer;
         private IDisposable _subscription;
@@ -31,6 +32,7 @@ namespace Features.Gameplay
             IObjectResolver container,
             ISubscriber<OnGameStateChanged> gameStateSubscriber,
             ISubscriber<CloneInputEvent> cloneSubscriber,
+            IShopService shopService,
             CinemachineVirtualCamera vcam,
             PlayerConfig config,
             [Key(InjectId.SpawnPoint)] Transform spawnPoint)
@@ -38,6 +40,7 @@ namespace Features.Gameplay
             _container = container;
             _gameStateSubscriber = gameStateSubscriber;
             _cloneSubscriber = cloneSubscriber;
+            _shopService = shopService;
             _vcam = vcam;
             _config = config;
             _spawnPoint = spawnPoint;
@@ -123,7 +126,8 @@ namespace Features.Gameplay
 
         private void SpawnPlayer(Vector3 position, Quaternion rotation)
         {
-            _currentPlayer = GameObject.Instantiate(_config.playerPrefab, position, rotation);
+            var prefab = _shopService.GetSelected().prefab ?? _config.playerPrefab;
+            _currentPlayer = GameObject.Instantiate(prefab, position, rotation);
 
             Rigidbody rb = _currentPlayer.GetComponent<Rigidbody>();
             if (rb != null)

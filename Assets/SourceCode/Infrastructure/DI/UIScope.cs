@@ -22,6 +22,7 @@ namespace Infrastructure.DI
             builder.Register<SettingsView>(Lifetime.Singleton);
             builder.Register<PauseView>(Lifetime.Singleton);
             builder.Register<HUDView>(Lifetime.Singleton);
+            builder.Register<ShopView>(Lifetime.Singleton);
             
             //! Presenter
             builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();   
@@ -30,6 +31,7 @@ namespace Infrastructure.DI
             
             //! Popups
             builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPopUp>();
+            builder.Register<ShopPresenter>(Lifetime.Singleton).As<IPopUp>();
         
         }
     }

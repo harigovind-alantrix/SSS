@@ -8,9 +8,10 @@ namespace Features.Gameplay
     public class FallDetector : MonoBehaviour
     {
         [SerializeField]
-        private float _fallThreshold = -20f;
+        private float _fallDistance = 20f;
 
         private IPublisher<PlayerFellEvent> _publisher;
+        private float _peakY;
         private bool _triggered;
 
         [Inject]
@@ -22,7 +23,15 @@ namespace Features.Gameplay
         private void Update()
         {
             if (_triggered) return;
-            if (transform.position.y < _fallThreshold)
+
+            float currentY = transform.position.y;
+
+            if (currentY > _peakY)
+            {
+                _peakY = currentY;
+            }
+
+            if (_peakY - currentY > _fallDistance)
             {
                 _triggered = true;
                 _publisher.Publish(new PlayerFellEvent());

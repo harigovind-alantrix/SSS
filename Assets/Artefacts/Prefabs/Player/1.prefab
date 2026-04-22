@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2816295ff8094877a0a0dbf81e9c9a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fallThreshold: -20
+  _fallDistance: 10
 --- !u!1001 &363866836802289930
 PrefabInstance:
   m_ObjectHideFlags: 0

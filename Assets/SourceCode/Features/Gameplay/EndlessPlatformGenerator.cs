@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Features.Gameplay;
 using UnityEngine;
 
 public class EndlessPlatformGenerator : MonoBehaviour
@@ -27,6 +28,7 @@ public class EndlessPlatformGenerator : MonoBehaviour
 
     private float lastX = 0f;
     private float lastY = 0f;
+    public CoinSpawner coinspawner;
 
     void Start()
     {
@@ -63,6 +65,11 @@ public class EndlessPlatformGenerator : MonoBehaviour
 
         GameObject platform = pool.GetPlatform();
         platform.transform.position = new Vector3(newX, newY, 0f);
+
+        if (coinspawner != null)
+        {
+            coinspawner.TrySpawnCoin(platform.transform.position);
+        }
 
         lastX = newX;
         lastY = newY;

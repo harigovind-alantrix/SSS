@@ -25,3 +25,27 @@ MonoBehaviour:
     prefab: {fileID: 4782842002824387290, guid: e6353baa0e53b43b59f1f9c14504a1e0,
       type: 3}
     isOwned: 1
+  - id: 003
+    displayName: whiteRed
+    price: 30
+    prefab: {fileID: 4782842002824387290, guid: 9100a60ef7097426d9bb02d2d23f72b3,
+      type: 3}
+    isOwned: 1
+  - id: 004
+    displayName: GreenWhite
+    price: 1
+    prefab: {fileID: 4782842002824387290, guid: e9e61785ebcf64304a56d25f1e6d9a9d,
+      type: 3}
+    isOwned: 1
+  - id: 005
+    displayName: YellowWhite
+    price: 1
+    prefab: {fileID: 4782842002824387290, guid: 92bede496cbdd435c801f4f1fab5d990,
+      type: 3}
+    isOwned: 1
+  - id: 006
+    displayName: BlackWhite
+    price: 1
+    prefab: {fileID: 4782842002824387290, guid: 09f757a5f7f864da687d3e06493d041e,
+      type: 3}
+    isOwned: 1

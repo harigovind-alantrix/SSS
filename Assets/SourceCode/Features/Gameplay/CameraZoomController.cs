@@ -41,7 +41,7 @@ namespace Features.Gameplay
 
         private void OnZoomEvent(CameraZoomEvent evt)
         {
-            targetFOV = evt.ZoomIn ? 60f : 48f;
+            targetFOV = evt.ZoomIn ? _config.zoomInFOV : _config.zoomOutFOV;
         }
 
         public void Dispose()

@@ -5,6 +5,5 @@ namespace Core.Models
         Playing,
         Paused,
         GameOver,
-        LevelComplete
     }
 }

@@ -14,10 +14,9 @@ namespace Infrastructure.Services
 
         private static readonly Dictionary<GameState, GameState[]> _allowed = new() {
             { GameState.Menu,          new[] { GameState.Playing,} },
-            { GameState.Playing,       new[] { GameState.Paused, GameState.GameOver, GameState.LevelComplete } },
+            { GameState.Playing,       new[] { GameState.Paused, GameState.GameOver, } },
             { GameState.Paused,        new[] { GameState.Playing, GameState.Menu } },
             { GameState.GameOver,      new[] { GameState.Menu } },
-            { GameState.LevelComplete, new[] { GameState.Menu, GameState.Playing } },
         };
         
         public GameState CurrentState { get; private  set; } = GameState.Menu;

@@ -24,11 +24,13 @@ namespace Infrastructure.DI
             builder.Register<PauseView>(Lifetime.Singleton);
             builder.Register<HUDView>(Lifetime.Singleton);
             builder.Register<ShopView>(Lifetime.Singleton);
+            builder.Register<GameOverView>(Lifetime.Singleton);
             
             //! Presenter
             builder.Register<MainMenuPresenter>(Lifetime.Singleton).As<IPresenter>();   
             builder.Register<PausePresenter>(Lifetime.Singleton).As<IPresenter>();
             builder.Register<HUDPresenter>(Lifetime.Singleton).As<IPresenter>();
+            builder.Register<GameOverPresenter>(Lifetime.Singleton).As<IPresenter>();
             
             //! Popups
             builder.Register<SettingsPresenter>(Lifetime.Singleton).As<IPopUp>();

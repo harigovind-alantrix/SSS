@@ -19,11 +19,11 @@ namespace Features.Gameplay
         private readonly IObjectResolver _container;
         private readonly ISubscriber<OnGameStateChanged> _gameStateSubscriber;
         private readonly ISubscriber<CloneInputEvent> _cloneSubscriber;
-        private readonly IShopService  _shopService;
+        private readonly IShopService _shopService;
         private readonly CinemachineVirtualCamera _vcam;
         private readonly PlayerConfig _config;
         private readonly Transform _spawnPoint;
-        
+
         private GameObject _currentPlayer;
         private GameObject _lastPlayer;
         private IDisposable _subscription;
@@ -83,7 +83,6 @@ namespace Features.Gameplay
                 ? new Vector3(evt.Axis, 0f, 0f).normalized
                 : Vector3.zero;
 
-            // Build fallback direction priority list
             Vector3[] directionsToTry = GetDirectionPriority(intendedDirection);
 
             Vector3 spawnPos = Vector3.zero;
@@ -138,18 +137,22 @@ namespace Features.Gameplay
             if (_vcam != null)
                 _vcam.Follow = _currentPlayer.transform;
 
-            Debug.Log($"[SpawnManager] Player spawned at {position}");
+            EndlessPlatformGenerator generator = GameObject.FindObjectOfType<EndlessPlatformGenerator>();
+            if (generator != null)
+                generator.SetTarget(_currentPlayer.transform);
+
+            Debug.Log($"Player spawned at {position}");
         }
 
         private Vector3[] GetDirectionPriority(Vector3 intended)
         {
-            Vector3[] allDirections = new Vector3[]
+            Vector3[] allDirections =
             {
-                new Vector3(0f, 1f, 0f), // up
-                new Vector3(1f, 0f, 0f), // right
-                new Vector3(-1f, 0f, 0f), // left
-                new Vector3(0f, 0f, 1f), // forward
-                new Vector3(0f, 0f, -1f), // back
+                Vector3.up,
+                Vector3.right,
+                Vector3.left,
+                Vector3.forward,
+                Vector3.back
             };
 
             if (intended == Vector3.zero)
@@ -188,12 +191,13 @@ namespace Features.Gameplay
             Vector3 probeOrigin = candidate + Vector3.up * 0.1f;
 
             float floorY;
+
             if (direction == Vector3.up)
             {
                 floorY = playerPos.y + CubeHalfExtent;
             }
-            else if (Physics.SphereCast(new Ray(probeOrigin, Vector3.down), CubeHalfExtent,
-                         out RaycastHit floorHit, 20f, GeometryMask))
+            else if (Physics.SphereCast(new Ray(probeOrigin, Vector3.down),
+                         CubeHalfExtent, out RaycastHit floorHit, 20f, GeometryMask))
             {
                 floorY = floorHit.point.y;
             }
@@ -203,9 +207,11 @@ namespace Features.Gameplay
             }
 
             Vector3 floorSurface = new Vector3(candidate.x, floorY + CubeHalfExtent, candidate.z);
+
             float ceilingY;
-            if (Physics.SphereCast(new Ray(floorSurface, Vector3.up), CubeHalfExtent,
-                    out RaycastHit ceilHit, 20f, GeometryMask))
+
+            if (Physics.SphereCast(new Ray(floorSurface, Vector3.up),
+                    CubeHalfExtent, out RaycastHit ceilHit, 20f, GeometryMask))
             {
                 ceilingY = ceilHit.point.y;
             }
@@ -223,13 +229,18 @@ namespace Features.Gameplay
                 return false;
             }
 
-            Vector3 spawnCenter = new Vector3(candidate.x, floorY + CubeHalfExtent + SpawnClearance, candidate.z);
+            Vector3 spawnCenter =
+                new Vector3(candidate.x, floorY + CubeHalfExtent + SpawnClearance, candidate.z);
+
             Vector3 halfExtents = Vector3.one * (CubeHalfExtent - 0.01f);
-            Collider[] overlaps = Physics.OverlapBox(spawnCenter, halfExtents, Quaternion.identity);
+
+            Collider[] overlaps = Physics.OverlapBox(
+                spawnCenter, halfExtents, Quaternion.identity);
 
             foreach (Collider col in overlaps)
             {
-                if (_currentPlayer != null && col.transform.IsChildOf(_currentPlayer.transform))
+                if (_currentPlayer != null &&
+                    col.transform.IsChildOf(_currentPlayer.transform))
                     continue;
 
                 result = Vector3.zero;

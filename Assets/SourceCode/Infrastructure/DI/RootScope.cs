@@ -29,6 +29,7 @@ namespace Infrastructure.DI
             builder.RegisterMessageBroker<OnCoinsChanged>(options);
 
             //? Gameplay
+            builder.RegisterMessageBroker<PlayerFellEvent>(options);
             builder.RegisterMessageBroker<MoveInputEvent>(options);
             builder.RegisterMessageBroker<JumpInputEvent>(options);
             builder.RegisterMessageBroker<CloneInputEvent>(options);

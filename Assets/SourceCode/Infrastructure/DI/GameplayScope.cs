@@ -1,4 +1,5 @@
 using Cinemachine;
+using Core.Messages.Gameplay;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -19,6 +20,7 @@ namespace Infrastructure.DI
         {
             builder.RegisterEntryPoint<InputService>();
             builder.RegisterEntryPoint<SpawnManager>();
+            builder.RegisterEntryPoint<GameOverHandler>(Lifetime.Scoped).AsImplementedInterfaces();
             
             builder.RegisterInstance(vcam);
             builder.RegisterInstance(playerConfig);

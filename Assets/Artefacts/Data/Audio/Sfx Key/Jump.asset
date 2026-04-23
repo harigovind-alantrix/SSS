@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b35556d7fd4c45b9a301abfc3f5ca46e, type: 3}
   m_Name: Jump
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
+  clip: {fileID: 8300000, guid: 182726e6a7f314c2387cb99f1794fbff, type: 3}

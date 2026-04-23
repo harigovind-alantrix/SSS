@@ -34,9 +34,6 @@ namespace Infrastructure.Services.Audio
             _sfxSource = sfxSource;
             _save = save;
 
-            _musicSource.outputAudioMixerGroup = _mixer.FindMatchingGroups("Music")[0];
-            _sfxSource.outputAudioMixerGroup = _mixer.FindMatchingGroups("Sfx")[0];
-
             Load();
             ApplyAll();
         }
@@ -65,7 +62,7 @@ namespace Infrastructure.Services.Audio
         public void SetMasterMute(bool isMuted)
         {
             IsMasterMuted = isMuted;
-            _save.SetBool(SaveKeys.MasterMuted, IsMasterMuted);
+            _save.SetBool(_config.masterMutedKey, IsMasterMuted);
             _save.Save();
             ApplyMasterMute();
         }
@@ -73,7 +70,7 @@ namespace Infrastructure.Services.Audio
         public void SetMusicMute(bool isMuted)
         {
             IsMusicMuted = isMuted;
-            _save.SetBool(SaveKeys.MusicMuted, IsMusicMuted);
+            _save.SetBool(_config.musicMutedKey, IsMusicMuted);
             _save.Save();
             ApplyMusicVolume();
         }
@@ -81,7 +78,7 @@ namespace Infrastructure.Services.Audio
         public void SetSfxMute(bool isMuted)
         {
             IsSfxMuted = isMuted;
-            _save.SetBool(SaveKeys.SfxMuted, IsSfxMuted);
+            _save.SetBool(_config.sfxMutedKey, IsSfxMuted);
             _save.Save();
             ApplySfxVolume();
         }
@@ -89,7 +86,7 @@ namespace Infrastructure.Services.Audio
         public void SetMusicVolume(float volume)
         {
             MusicVolume = Mathf.Clamp01(volume);
-            _save.SetFloat(SaveKeys.MusicVolume, MusicVolume);
+            _save.SetFloat(_config.musicVolumeKey, MusicVolume);
             _save.Save();
             ApplyMusicVolume();
         }
@@ -97,7 +94,7 @@ namespace Infrastructure.Services.Audio
         public void SetSfxVolume(float volume)
         {
             SfxVolume = Mathf.Clamp01(volume);
-            _save.SetFloat(SaveKeys.SfxVolume, SfxVolume);
+            _save.SetFloat(_config.sfxVolumeKey, SfxVolume);
             _save.Save();
             ApplySfxVolume();
         }
@@ -106,11 +103,11 @@ namespace Infrastructure.Services.Audio
 
         private void Load()
         {
-            MusicVolume = _save.GetFloat(SaveKeys.MusicVolume, 1f);
-            SfxVolume = _save.GetFloat(SaveKeys.SfxVolume, 1f);
-            IsMusicMuted = _save.GetBool(SaveKeys.MusicMuted, false);
-            IsSfxMuted = _save.GetBool(SaveKeys.SfxMuted, false);
-            IsMasterMuted = _save.GetBool(SaveKeys.MasterMuted, false);
+            MusicVolume = _save.GetFloat(_config.musicVolumeKey, 1f);
+            SfxVolume = _save.GetFloat(_config.sfxVolumeKey, 1f);
+            IsMusicMuted = _save.GetBool(_config.musicMutedKey, false);
+            IsSfxMuted = _save.GetBool(_config.sfxMutedKey, false);
+            IsMasterMuted = _save.GetBool(_config.masterMutedKey, false);
         }
 
         private void ApplyAll()

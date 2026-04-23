@@ -19,16 +19,10 @@ namespace Infrastructure.DI
         private AudioConfig audioConfig;
 
         [SerializeField]
-        private AudioKeys audioKeys;
-
-        [SerializeField]
-        private AudioSource musicSource;
-
-        [SerializeField]
-        private AudioSource sfxSource;
-
-        [SerializeField]
         private ShopConfig shopConfig;
+        
+        private AudioSource _musicSource;
+        private AudioSource _sfxSource;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -37,10 +31,10 @@ namespace Infrastructure.DI
             builder.RegisterMessageBroker<OnGameStateChanged>(options);
             builder.RegisterMessageBroker<OnGameRestarted>(options);
 
-            //? Progression
+            //! Progression
             builder.RegisterMessageBroker<OnCoinsChanged>(options);
 
-            //? Gameplay
+            //! Gameplay
             builder.RegisterMessageBroker<PlayerFellEvent>(options);
             builder.RegisterMessageBroker<MoveInputEvent>(options);
             builder.RegisterMessageBroker<JumpInputEvent>(options);
@@ -53,16 +47,32 @@ namespace Infrastructure.DI
             builder.Register<ProgressionService>(Lifetime.Singleton).As<IProgressionService>();
 
             //! Audio
+            CreateAudioSource();
             builder.RegisterInstance(audioConfig);
-            builder.RegisterInstance(audioKeys);
-            builder.RegisterInstance(musicSource).Keyed(InjectId.Music);
-            builder.RegisterInstance(sfxSource).Keyed(InjectId.Sfx);
+            builder.RegisterInstance(_musicSource).Keyed(InjectId.Music);
+            builder.RegisterInstance(_sfxSource).Keyed(InjectId.Sfx);
             builder.Register<AudioService>(Lifetime.Singleton).As<IAudioService>();
 
 
             //! Shop
             builder.RegisterInstance(shopConfig);
             builder.Register<ShopService>(Lifetime.Singleton).As<IShopService>();
+        }
+
+        private void CreateAudioSource()
+        {
+            var audioGo = new GameObject("[AudioService]");
+            DontDestroyOnLoad(audioGo);
+
+            _musicSource = audioGo.AddComponent<AudioSource>();
+            _musicSource.playOnAwake = false;
+            _musicSource.loop = true;
+            _musicSource.outputAudioMixerGroup = audioConfig.mixer.FindMatchingGroups("Music")[0];
+
+            _sfxSource = audioGo.AddComponent<AudioSource>();
+            _sfxSource.playOnAwake = false;
+            _sfxSource.loop = false;
+            _sfxSource.outputAudioMixerGroup = audioConfig.mixer.FindMatchingGroups("Sfx")[0];
         }
     }
 }

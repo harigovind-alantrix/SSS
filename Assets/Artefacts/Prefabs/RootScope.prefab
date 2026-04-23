@@ -48,4 +48,5 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
+  audioConfig: {fileID: 11400000, guid: a8e1cdff8e17145a78577a697d96369f, type: 2}
   shopConfig: {fileID: 11400000, guid: 9dc75f71e16ae49ad8b602ec00d19f32, type: 2}

@@ -16,3 +16,17 @@ MonoBehaviour:
   masterVolumeParam: MasterVolume
   musicVolumeParam: MusicVolume
   sfxVolumeParam: SFXVolume
+  masterMutedKey: MasterMuted
+  musicVolumeKey: MusicVol
+  musicMutedKey: MusicMuted
+  sfxVolumeKey: SfxVol
+  sfxMutedKey: SfxMuted
+  menuMusic: {fileID: 11400000, guid: 5361995359a504fa1bf5bd46ddf3ea81, type: 2}
+  gameplayMusic: {fileID: 11400000, guid: 6a95ad3422ea74d77aefb2963fd28afa, type: 2}
+  gameOverMusic: {fileID: 11400000, guid: 0c8fb4b5074f142eebedbe0cfbcbfe73, type: 2}
+  jump: {fileID: 11400000, guid: 5870c17078f4840d2b22b04e150892b6, type: 2}
+  land: {fileID: 11400000, guid: 53143552a2716446fba7dc8add4acb8b, type: 2}
+  clone: {fileID: 11400000, guid: 5ba61a3c034d54b5ca0058df6e3306a3, type: 2}
+  death: {fileID: 11400000, guid: a1f343d582d30416ebac5e80fac51527, type: 2}
+  purchase: {fileID: 11400000, guid: 6386dc1386fbe48bcaf0df99514883ab, type: 2}
+  buttonClick: {fileID: 11400000, guid: a30641a117d224af4b96fa5244d37ab2, type: 2}

@@ -14,7 +14,7 @@ namespace Core.Messages.System
         }
     }
 
-    public readonly struct OnGameStarted
+    public readonly struct OnGameRestarted
     {
         
     }

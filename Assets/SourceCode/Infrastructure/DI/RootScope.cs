@@ -23,7 +23,7 @@ namespace Infrastructure.DI
                 options.EnableCaptureStackTrace = true;
             });
             builder.RegisterMessageBroker<OnGameStateChanged>(options);
-            builder.RegisterMessageBroker<OnGameStarted>(options);
+            builder.RegisterMessageBroker<OnGameRestarted>(options);
 
             //? Progression
             builder.RegisterMessageBroker<OnCoinsChanged>(options);

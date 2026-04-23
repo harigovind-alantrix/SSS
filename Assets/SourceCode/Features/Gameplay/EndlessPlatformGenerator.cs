@@ -1,7 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Messages.System;
 using Features.Gameplay;
+using MessagePipe;
 using UnityEngine;
+using VContainer;
+using Random = UnityEngine.Random;
 
 public class EndlessPlatformGenerator : MonoBehaviour
 {
@@ -29,7 +34,13 @@ public class EndlessPlatformGenerator : MonoBehaviour
     private float lastX = 0f;
     private float lastY = 0f;
     public CoinSpawner coinspawner;
+    private IDisposable _subscription;
 
+    [Inject]
+    public void Construct(ISubscriber<OnGameRestarted> restartSubscriber)
+    {
+        _subscription = restartSubscriber.Subscribe(OnGameRestarted);
+    }
     void Start()
     {
         for (int i = 0; i < initialPlatforms; i++)
@@ -43,6 +54,23 @@ public class EndlessPlatformGenerator : MonoBehaviour
         {
             SpawnNextPlatform();
         }
+    }
+    private void OnGameRestarted(OnGameRestarted _)
+    {
+        // Return all active platforms to pool
+        foreach (var platform in FindObjectsOfType<PlatformAutoReturn>())
+            pool.ReturnPlatform(platform.gameObject);
+
+        // Reset state
+        lastX = 0f;
+        lastY = 0f;
+
+        SpawnInitialPlatforms();
+    }
+    private void SpawnInitialPlatforms()
+    {
+        for (int i = 0; i < initialPlatforms; i++)
+            SpawnNextPlatform();
     }
 
     void SpawnNextPlatform()

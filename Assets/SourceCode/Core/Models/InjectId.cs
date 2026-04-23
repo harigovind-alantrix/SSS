@@ -3,6 +3,8 @@ namespace Core.Models
     public enum InjectId
     {
         Player,
-        SpawnPoint
+        SpawnPoint,
+        Music,
+        Sfx
     }
 }

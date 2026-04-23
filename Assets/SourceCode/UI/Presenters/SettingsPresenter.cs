@@ -45,13 +45,13 @@ namespace UI.Presenters
         private void OnSfxSliderChanged(EventContext ctx)
         {
             var normalized = (float)_view.SfxSlider.value / 100f;
-            _audioService.SetSFXVolume(normalized);
+            _audioService.SetSfxVolume(normalized);
         }
 
         private void OnMuteClicked(EventContext ctx)
         {
-            _audioService.ToggleMute();
-            _view.MuteBtn.selected = _audioService.IsMuted;
+            _audioService.SetMasterMute(true);
+            _view.MuteBtn.selected = _audioService.IsMasterMuted;
         }
 
         private void OnCloseClicked(EventContext ctx)

@@ -15,12 +15,12 @@ namespace Entities.Player
         private PlayerMovement _movement;
         private PlayerJump _jump;
         private PlayerRotation _rotation;
-        private GroundChecker _groundChecker;
 
         private IDisposable _subscriptions;
         private float _lastMoveAxis;
         private bool _jumpRequested;
         private bool _frozen = false;
+        private bool _isGrounded;
 
         [Inject]
         public void Construct(PlayerConfig config,
@@ -28,9 +28,8 @@ namespace Entities.Player
             ISubscriber<JumpInputEvent> jumpSubscriber,
             IPublisher<CameraZoomEvent> zoomPublisher)
         {
-            _groundChecker = new GroundChecker();
             _movement = new PlayerMovement(_rigidbody, config);
-            _jump = new PlayerJump(_rigidbody, config, _groundChecker, zoomPublisher);
+            _jump = new PlayerJump(_rigidbody, config, zoomPublisher);
             _rotation = new PlayerRotation(transform, config, _jump);
 
             var d = DisposableBag.CreateBuilder();
@@ -50,13 +49,15 @@ namespace Entities.Player
             if (_frozen) return;
 
             _movement?.Move(_lastMoveAxis);
-            _jump?.Tick();
+            _jump?.Tick(_isGrounded);
 
             if (_jumpRequested)
             {
-                _jump?.Jump();
+                _jump?.Jump(_isGrounded);
                 _jumpRequested = false;
             }
+
+            _isGrounded = false;
         }
 
         private void OnMove(MoveInputEvent evt) => _lastMoveAxis = evt.Axis;
@@ -75,9 +76,15 @@ namespace Entities.Player
             _rigidbody.angularVelocity = Vector3.zero;
             _rigidbody.isKinematic = true;
         }
-        void OnCollisionEnter(Collision collision) => _groundChecker.OnCollisionEnter(collision);
-        void OnCollisionExit(Collision collision) => _groundChecker.OnCollisionExit(collision);
-
+        void OnCollisionStay(Collision collision)
+        {
+            if (collision.gameObject.CompareTag("Ground") || 
+                collision.gameObject.CompareTag("Platform") || 
+                collision.gameObject.CompareTag("Player"))
+            {
+                _isGrounded = true;
+            }
+        }
         public void Dispose()
         {
             _subscriptions?.Dispose();

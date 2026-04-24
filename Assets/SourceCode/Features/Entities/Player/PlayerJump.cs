@@ -9,26 +9,27 @@ namespace Entities.Player
     {
         private readonly Rigidbody _rb;
         private readonly PlayerConfig _config;
-        private readonly GroundChecker _groundChecker;
         private readonly IPublisher<CameraZoomEvent> _zoomPublisher;
 
         private bool _wasGrounded;
+        private bool _currentGrounded;
+            
+        private float _lastJumpTime; 
+        private const float JumpCooldown = .7f;
 
         public PlayerJump(
             Rigidbody rb,
             PlayerConfig config,
-            GroundChecker groundChecker,
             IPublisher<CameraZoomEvent> zoomPublisher)
         {
             _rb = rb;
             _config = config;
-            _groundChecker = groundChecker;
             _zoomPublisher = zoomPublisher;
         }
 
-        public void Tick()
+        public void Tick(bool isGrounded)
         {
-            bool isGrounded = _groundChecker.IsGrounded();
+            _currentGrounded = isGrounded;
             
             if (isGrounded && !_wasGrounded)
             {
@@ -40,15 +41,15 @@ namespace Entities.Player
             _wasGrounded = isGrounded;
         }
 
-        public void Jump()
+        public void Jump(bool isGrounded)
         {
-            if (_groundChecker.IsGrounded())
+            if (isGrounded && Time.time >= _lastJumpTime + JumpCooldown)
             {
                 _rb.velocity = new Vector3(_rb.velocity.x, _config.jumpForce, _rb.velocity.z);
+                _lastJumpTime = Time.time;
                 _zoomPublisher?.Publish(new CameraZoomEvent(true));
             }
         }
-
-        public bool IsJumping() => !_groundChecker.IsGrounded();
+        public bool IsJumping() => !_currentGrounded;
     }
 }

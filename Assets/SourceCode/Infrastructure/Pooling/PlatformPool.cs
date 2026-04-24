@@ -1,41 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
+using VContainer;
 
 public class PlatformPool : MonoBehaviour
 {
-    public GameObject platformPrefab;
-    public int poolSize = 20;
-    public Transform Container;
+    [SerializeField]
+    private PlatformAutoReturn platformPrefab;
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
+    [SerializeField]
+    private int initialSize = 20;
 
-    void Start()
+    [SerializeField]
+    private int maxSize = 60;
+
+    [SerializeField]
+    private Transform poolContainer;
+
+    private ObjectPool<PlatformAutoReturn> _pool;
+
+    [Inject]
+    public void Construct(IObjectResolver container)
     {
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject obj = Instantiate(platformPrefab, Container);
-            obj.SetActive(false);
-            pool.Enqueue(obj);
-        }
+        _pool = new ObjectPool<PlatformAutoReturn>(
+            container:   container,
+            prefab:      platformPrefab,
+            parent:      poolContainer != null ? poolContainer : transform,
+            initialSize: initialSize,
+            poolName:    "[PlatformPool]",
+            maxSize:     maxSize);
     }
 
     public GameObject GetPlatform()
     {
-        if (pool.Count > 0)
-        {
-            GameObject obj = pool.Dequeue();
-            obj.SetActive(true);
-            return obj;
-        }
-
-        GameObject newObj = Instantiate(platformPrefab, Container);
-        return newObj;
+        var platform = _pool.Get();
+        platform.SetPool(this);
+        return platform.gameObject;
     }
 
     public void ReturnPlatform(GameObject obj)
     {
-        obj.SetActive(false);
-        pool.Enqueue(obj);
+        var platform = obj.GetComponent<PlatformAutoReturn>();
+        if (platform == null) return;
+ 
+        platform.OnReturnedToPool();
+        _pool.Return(platform);
     }
+ 
+    void OnDestroy() => _pool?.Dispose();
 }

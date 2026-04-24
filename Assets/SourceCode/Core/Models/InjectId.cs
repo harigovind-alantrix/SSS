@@ -5,6 +5,8 @@ namespace Core.Models
         Player,
         SpawnPoint,
         Music,
-        Sfx
+        Sfx,
+        CoinView,
+        CoinPoolParent,
     }
 }

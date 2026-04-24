@@ -8,11 +8,11 @@ using UnityEngine;
 using VContainer;
 using Random = UnityEngine.Random;
 
-public class EndlessPlatformGenerator : MonoBehaviour
+public class PlatformGenerator : MonoBehaviour
 {
     public PlatformPool pool;
     [Header("Target Player")]
-    public Transform targetPlayer;
+    private Transform targetPlayer;
 
     [Header("Start")]
     public int initialPlatforms = 12;

@@ -7,20 +7,22 @@ using Core.Messages.System;
 using Core.Models;
 using Data.Configs;
 using Entities.Player;
+using Features.Gameplay.Coin;
 using MessagePipe;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 namespace Features.Gameplay
 {
     public class SpawnManager : IInitializable, IDisposable
     {
-        private readonly IObjectResolver _container;
         private readonly ISubscriber<OnGameStateChanged> _gameStateSubscriber;
         private readonly ISubscriber<CloneInputEvent> _cloneSubscriber;
-        private readonly IShopService _shopService;
-        private readonly CinemachineVirtualCamera _vcam;
+        private readonly IPlayerFactory _playerFactory;
+        private readonly CoinSystem _coinSystem;
+        private readonly PlatformGenerator _platformGenerator;
         private readonly PlayerConfig _config;
         private readonly Transform _spawnPoint;
 
@@ -29,19 +31,19 @@ namespace Features.Gameplay
         private IDisposable _subscription;
 
         public SpawnManager(
-            IObjectResolver container,
             ISubscriber<OnGameStateChanged> gameStateSubscriber,
             ISubscriber<CloneInputEvent> cloneSubscriber,
-            IShopService shopService,
-            CinemachineVirtualCamera vcam,
+            IPlayerFactory playerFactory,
+            CoinSystem coinSystem,
+            PlatformGenerator platformGenerator,
             PlayerConfig config,
             [Key(InjectId.SpawnPoint)] Transform spawnPoint)
         {
-            _container = container;
             _gameStateSubscriber = gameStateSubscriber;
             _cloneSubscriber = cloneSubscriber;
-            _shopService = shopService;
-            _vcam = vcam;
+            _playerFactory = playerFactory;
+            _coinSystem = coinSystem;
+            _platformGenerator = platformGenerator;
             _config = config;
             _spawnPoint = spawnPoint;
         }
@@ -110,7 +112,7 @@ namespace Features.Gameplay
             pc.Freeze();
             if (_lastPlayer != null)
             {
-                GameObject.Destroy(_lastPlayer);
+                Object.Destroy(_lastPlayer);
             }
 
             _lastPlayer = _currentPlayer;
@@ -125,23 +127,11 @@ namespace Features.Gameplay
 
         private void SpawnPlayer(Vector3 position, Quaternion rotation)
         {
-            var prefab = _shopService.GetSelected().prefab ?? _config.playerPrefab;
-            _currentPlayer = GameObject.Instantiate(prefab, position, rotation);
+            _currentPlayer = _playerFactory.Create(position, rotation);
+            _platformGenerator.SetTarget(_currentPlayer.transform);
+            _coinSystem.SetPlayerTarget(_currentPlayer.transform);
 
-            Rigidbody rb = _currentPlayer.GetComponent<Rigidbody>();
-            if (rb != null)
-                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
-            _container.InjectGameObject(_currentPlayer);
-
-            if (_vcam != null)
-                _vcam.Follow = _currentPlayer.transform;
-
-            EndlessPlatformGenerator generator = GameObject.FindObjectOfType<EndlessPlatformGenerator>();
-            if (generator != null)
-                generator.SetTarget(_currentPlayer.transform);
-
-            Debug.Log($"Player spawned at {position}");
+            // Debug.Log($"Player spawned at {position}");
         }
 
         private Vector3[] GetDirectionPriority(Vector3 intended)

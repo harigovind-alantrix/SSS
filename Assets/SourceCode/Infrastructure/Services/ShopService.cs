@@ -13,11 +13,10 @@ namespace Infrastructure.Services
         private readonly ShopConfig _config;
         private readonly IProgressionService _progression;
         private readonly ISaveService _save;
-        
-        private int _coins;
-        private string _selectedId;
 
-        public int Coins => _coins;
+        private readonly HashSet<string> _ownedIds = new();
+
+        public int Coins => _progression.Coins;
         public IReadOnlyList<ShopItem> Items => _config.items;
 
 
@@ -31,7 +30,12 @@ namespace Infrastructure.Services
             _save = save;
 
             foreach (var item in _config.items)
-                item.isOwned = _progression.IsOwned(item.id);
+            {
+                if (_progression.IsOwned(item.id))
+                {
+                    _ownedIds.Add(item.id);
+                }
+            }
         }
 
 
@@ -41,7 +45,7 @@ namespace Infrastructure.Services
             if (item == null || item.isOwned) return false;
             if (!_progression.SpendCoins(item.price)) return false;
 
-            item.isOwned = true;
+            _ownedIds.Add(itemId);
             _progression.SetOwned(itemId);
             Select(itemId);
             return true;
@@ -49,16 +53,20 @@ namespace Infrastructure.Services
 
         public ShopItem GetSelected()
         {
-           var id = _save.GetString(SaveKeys.SelectedSkin);
-           return _config.items.Find(x => x.id == id) ?? _config.items[0];
+            var id = _save.GetString(SaveKeys.SelectedSkin);
+
+            var item = _config.items.Find(x => x.id == id && _ownedIds.Contains(x.id));
+
+            return item ?? _config.items[0];
         }
 
         public void Select(string itemId)
         {
-            var item = _config.items.Find(x => x.id == itemId && x.isOwned);
-            if (item == null) return;
+            if (!_ownedIds.Contains(itemId)) return;
             _save.SetString(SaveKeys.SelectedSkin, itemId);
             _save.Save();
         }
+        
+        public bool IsOwned(string itemId) => _ownedIds.Contains(itemId);
     }
 }

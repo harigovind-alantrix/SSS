@@ -13,11 +13,15 @@ namespace UI.Presenters
 
         private readonly GameOverView _view;
         private readonly IGameStateService _gameStateService;
+        private readonly IProgressionService _progressionService;
 
-        public GameOverPresenter(GameOverView view, IGameStateService gameStateService)
+        public GameOverPresenter(GameOverView view,
+            IGameStateService gameStateService,
+            IProgressionService progressionService)
         {
             _view = view;
             _gameStateService = gameStateService;
+            _progressionService = progressionService;
         }
 
         public void Initialize()
@@ -27,7 +31,12 @@ namespace UI.Presenters
             _view.MenuButton.onClick.Add(OnMenuClicked);
         }
 
-        public void Show() => _view.Show();
+        public void Show()
+        {
+            _view.Show();
+            SetScore(_progressionService.SessionCoins);
+        }
+
         public void Hide() => _view.Hide();
 
         private void OnRestartClicked(EventContext ctx)
@@ -36,10 +45,15 @@ namespace UI.Presenters
         private void OnMenuClicked(EventContext ctx)
             => _gameStateService.SetState(GameState.Menu);
 
+        private void SetScore(int score)
+        {
+            _view.CoinCountText.text = score.ToString();
+        }
+
         public void Dispose()
         {
-            if(_view != null) _view.RestartButton.onClick.Remove(OnRestartClicked);
-            if(_view != null) _view.MenuButton.onClick.Remove(OnMenuClicked);
+            if (_view != null) _view.RestartButton.onClick.Remove(OnRestartClicked);
+            if (_view != null) _view.MenuButton.onClick.Remove(OnMenuClicked);
         }
     }
 }

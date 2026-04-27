@@ -33,7 +33,8 @@ namespace Infrastructure.DI
 
             //! Progression
             builder.RegisterMessageBroker<OnCoinsChanged>(options);
-
+            builder.RegisterMessageBroker<OnSessionCoinsChanged>(options); 
+            
             //! Gameplay
             builder.RegisterMessageBroker<PlayerFellEvent>(options);
             builder.RegisterMessageBroker<MoveInputEvent>(options);

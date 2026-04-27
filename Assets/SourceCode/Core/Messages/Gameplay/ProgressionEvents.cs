@@ -13,4 +13,9 @@ namespace Core.Messages.Gameplay
             CurrentCoins = currentCoins;
         }
     }
+    public readonly struct OnSessionCoinsChanged
+    {
+        public readonly int SessionCoins;
+        public OnSessionCoinsChanged(int sessionCoins) => SessionCoins = sessionCoins;
+    }
 }

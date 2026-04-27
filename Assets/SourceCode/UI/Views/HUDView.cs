@@ -12,6 +12,7 @@ namespace UI.Views
         private GButton _leftButton;
         private GButton _rightButton;
         private GButton _cloneButton;
+        private GTextField _coinCountText;
         
         protected override void OnCreateUI()
         {
@@ -19,11 +20,13 @@ namespace UI.Views
             _leftButton = Panel.GetChild("LeftBtn").asButton;
             _rightButton = Panel.GetChild("RightBtn").asButton;
             _cloneButton = Panel.GetChild("CloneBtn").asButton;
+            _coinCountText = Panel.GetChild("CoinCountText").asTextField;
         }
         
         public GButton PauseButton => _pauseButton;
         public GButton LeftButton => _leftButton;
         public GButton RightButton => _rightButton;
         public GButton CloneButton => _cloneButton;
+        public GTextField CoinCountText => _coinCountText;
     }
 }

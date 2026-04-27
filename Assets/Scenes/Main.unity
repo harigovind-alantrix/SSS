@@ -347,9 +347,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 389369559}
-  - component: {fileID: 389369558}
-  - component: {fileID: 389369557}
-  - component: {fileID: 389369556}
+  - component: {fileID: 389369560}
   m_Layer: 0
   m_Name: CoinManager
   m_TagString: Untagged
@@ -357,7 +355,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &389369556
+--- !u!4 &389369559
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 389369555}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &389369560
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -369,51 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2c805a1e64ee470094198ca73e4ca1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pool: {fileID: 389369557}
   coinChance: 0.45
---- !u!114 &389369557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389369555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b6d6c13db1e6413698c2d922f828132, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coinPrefab: {fileID: 3848209570521893271, guid: 5218a806ef44c43df804a5b403acc5ac,
-    type: 3}
-  startAmount: 30
---- !u!114 &389369558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389369555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d16a08fdaa37544d2abbcbb91f1f2c1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coins: 0
---- !u!4 &389369559
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389369555}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.3803644, y: -1.871924, z: 83.64263}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 19
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,7 +905,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1034662643}
   m_Layer: 0
-  m_Name: Platform Container
+  m_Name: "\uF746Containers"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1164,6 +1133,9 @@ MonoBehaviour:
   vcam: {fileID: 1787260955}
   playerConfig: {fileID: 11400000, guid: 13432f6b081f74ec1bdb9b0bcfd13030, type: 2}
   spawnPoint: {fileID: 685540771}
+  coinPrefab: {fileID: 2038187380508610664, guid: 5218a806ef44c43df804a5b403acc5ac,
+    type: 3}
+  coinPoolParent: {fileID: 1034662643}
 --- !u!1 &1398819609
 GameObject:
   m_ObjectHideFlags: 0
@@ -1451,10 +1423,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8e42a3430aaf46028d76a63bd40145b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  platformPrefab: {fileID: 1595586085057478487, guid: c69e19b27dac74156bb5c258e8ed1e20,
+  platformPrefab: {fileID: -2447260687366734879, guid: c69e19b27dac74156bb5c258e8ed1e20,
     type: 3}
-  poolSize: 20
-  Container: {fileID: 1034662643}
+  initialSize: 20
+  maxSize: 60
+  poolContainer: {fileID: 1034662643}
 --- !u!114 &2076873214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1468,7 +1441,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pool: {fileID: 2076873213}
-  targetPlayer: {fileID: 0}
   initialPlatforms: 12
   minXStep: 1.5
   maxXStep: 4
@@ -1477,7 +1449,7 @@ MonoBehaviour:
   minX: -5
   maxX: 5
   spawnAheadY: 15
-  coinspawner: {fileID: 389369556}
+  coinspawner: {fileID: 389369560}
 --- !u!4 &2076873215
 Transform:
   m_ObjectHideFlags: 0
@@ -1486,7 +1458,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2076873212}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.9138823, y: -13.271115, z: 50.848194}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
